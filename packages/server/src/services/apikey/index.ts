@@ -1,6 +1,8 @@
 import { StatusCodes } from 'http-status-codes'
 import { v4 as uuidv4 } from 'uuid'
 import { ApiKey } from '../../database/entities/ApiKey'
+import { ChatFlow } from '../../database/entities/ChatFlow'
+import { Workspace } from '../../database/entities/Workspace'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getErrorMessage } from '../../errors/utils'
 import { Platform } from '../../Interface'
@@ -16,7 +18,7 @@ import logger from '../../utils/logger'
  * @param operation - The operation being performed (for error message)
  * @throws InternalFlowiseError if validation fails
  */
-function validatePermissions(user: LoggedInUser, requestedPermissions: string[], operation: string) {
+function validatePermissions(user: LoggedInUser | undefined, requestedPermissions: string[], operation: string) {
     // API Keys should not have workspace or admin permissions
     // This applies to ALL users, including admins (platform constraint)
     const hasRestrictedPermissions = requestedPermissions.some(
@@ -30,7 +32,7 @@ function validatePermissions(user: LoggedInUser, requestedPermissions: string[],
     // For Cloud platform, check feature-gated permissions
     // This also applies to ALL users, including admins (platform constraint)
     const appServer = getRunningExpressApp()
-    if (appServer.identityManager.getPlatformType() === Platform.CLOUD) {
+    if (appServer.identityManager.getPlatformType() === Platform.CLOUD && user) {
         if (!user.features) {
             // On Cloud platform, user features should always exist
             // Log the anomaly with context for debugging
@@ -74,7 +76,7 @@ function validatePermissions(user: LoggedInUser, requestedPermissions: string[],
     }
 
     // User permission validation - only applies to non-admins (authorization check)
-    if (!user.isOrganizationAdmin) {
+    if (user && !user.isOrganizationAdmin) {
         // Check if all requested permissions are included in user permissions
         const hasInvalidPermissions = requestedPermissions.some((permission: string) => !user.permissions.includes(permission))
         if (hasInvalidPermissions) {
@@ -172,7 +174,7 @@ const getApiKeyById = async (apiKeyId: string) => {
     }
 }
 
-const createApiKey = async (user: LoggedInUser, keyName: string, permissions: string[]) => {
+const createApiKey = async (user: LoggedInUser | undefined, keyName: string, permissions: string[]) => {
     // Validate permissions before creating the key
     validatePermissions(user, permissions, 'create')
 
@@ -185,10 +187,33 @@ const createApiKey = async (user: LoggedInUser, keyName: string, permissions: st
     newKey.apiSecret = apiSecret
     newKey.keyName = keyName
     newKey.permissions = permissions
-    newKey.workspaceId = user.activeWorkspaceId
+    let workspaceId = user?.activeWorkspaceId
+    if (!workspaceId) {
+        const latestFlow = await appServer.AppDataSource.getRepository(ChatFlow)
+            .createQueryBuilder('chat_flow')
+            .select('chat_flow.workspaceId', 'workspaceId')
+            .where('chat_flow.workspaceId IS NOT NULL')
+            .andWhere("chat_flow.workspaceId <> ''")
+            .orderBy('chat_flow.updatedDate', 'DESC')
+            .getRawOne()
+        workspaceId = latestFlow?.workspaceId
+    }
+    if (!workspaceId) {
+        const latestWorkspace = await appServer.AppDataSource.getRepository(Workspace)
+            .createQueryBuilder('workspace')
+            .select('workspace.id', 'id')
+            .orderBy('workspace.updatedDate', 'DESC')
+            .getRawOne()
+        workspaceId = latestWorkspace?.id
+    }
+    if (!workspaceId) {
+        throw new InternalFlowiseError(StatusCodes.PRECONDITION_FAILED, 'Workspace ID is required')
+    }
+    newKey.workspaceId = workspaceId
     const key = appServer.AppDataSource.getRepository(ApiKey).create(newKey)
     await appServer.AppDataSource.getRepository(ApiKey).save(key)
-    return await getAllApiKeys(user)
+    const responseUser = user || ({ activeWorkspaceId: workspaceId, isOrganizationAdmin: true, permissions: [] } as LoggedInUser)
+    return await getAllApiKeys(responseUser)
 }
 
 // Update api key
