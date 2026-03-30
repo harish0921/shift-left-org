@@ -17,16 +17,15 @@ const createDocumentStore = async (req: Request, res: Response, next: NextFuncti
             )
         }
 
-        const orgId = req.user?.activeOrganizationId
-        if (!orgId) {
-            throw new InternalFlowiseError(
-                StatusCodes.PRECONDITION_FAILED,
-                `Error: documentStoreController.createDocumentStore - organizationId not provided!`
-            )
-        }
-
         const body = req.body
-        const workspaceId = req.user?.activeWorkspaceId || ''
+        const workspaceId = req.user?.activeWorkspaceId || body?.workspaceId || ''
+        let orgId = req.user?.activeOrganizationId || req.user?.organizationId || body?.organizationId
+        if (!orgId && workspaceId) {
+            const workspace = await getRunningExpressApp().AppDataSource.getRepository(Workspace).findOneBy({ id: workspaceId })
+            orgId = workspace?.organizationId
+        }
+        if (!orgId) orgId = 'unknown'
+
 const docStore = DocumentStoreDTO.toEntity(body)
         docStore.workspaceId = workspaceId
         const apiResponse = await documentStoreService.createDocumentStore(docStore, orgId)

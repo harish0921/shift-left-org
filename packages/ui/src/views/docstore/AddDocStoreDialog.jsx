@@ -1,7 +1,7 @@
 import { createPortal } from 'react-dom'
 import PropTypes from 'prop-types'
 import { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import {
     HIDE_CANVAS_DIALOG,
     SHOW_CANVAS_DIALOG,
@@ -41,6 +41,7 @@ const AddDocStoreDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
     const [documentStoreDesc, setDocumentStoreDesc] = useState('')
     const [dialogType, setDialogType] = useState('ADD')
     const [docStoreId, setDocumentStoreId] = useState()
+    const currentUser = useSelector((state) => state.auth.user)
 
     useEffect(() => {
         setDialogType(dialogProps.type)
@@ -69,7 +70,9 @@ const AddDocStoreDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
         try {
             const obj = {
                 name: documentStoreName,
-                description: documentStoreDesc
+                description: documentStoreDesc,
+                organizationId: currentUser?.activeOrganizationId,
+                workspaceId: currentUser?.activeWorkspaceId
             }
             const createResp = await documentStoreApi.createDocumentStore(obj)
             if (createResp.data) {
