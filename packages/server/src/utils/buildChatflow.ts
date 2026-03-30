@@ -1028,29 +1028,36 @@ export const utilBuildChatflow = async (req: Request, isInternal: boolean = fals
             }
         }
 
-        // This can be public API, so we can only get orgId from the chatflow
-        const chatflowWorkspaceId = chatflow.workspaceId
-        const workspace = await appServer.AppDataSource.getRepository(Workspace).findOneBy({
-            id: chatflowWorkspaceId
-        })
-        if (!workspace) {
-            throw new InternalFlowiseError(StatusCodes.NOT_FOUND, `Workspace ${chatflowWorkspaceId} not found`)
-        }
-        const workspaceId = workspace.id
+        // Prefer authenticated context; fall back safely for OSS builds where enterprise globals may be unavailable.
+        let workspaceId = req.user?.activeWorkspaceId || chatflow.workspaceId || ''
+        let orgId = req.user?.activeOrganizationId || ''
+        let subscriptionId = req.user?.activeOrganizationSubscriptionId || ''
 
-        const org = await appServer.AppDataSource.getRepository(Organization).findOneBy({
-            id: workspace.organizationId
-        })
-        if (!org) {
-            throw new InternalFlowiseError(StatusCodes.NOT_FOUND, `Organization ${workspace.organizationId} not found`)
+        if ((!orgId || !subscriptionId) && typeof Workspace !== 'undefined' && typeof Organization !== 'undefined') {
+            const chatflowWorkspaceId = chatflow.workspaceId
+            const workspace = await appServer.AppDataSource.getRepository(Workspace).findOneBy({
+                id: chatflowWorkspaceId
+            })
+            if (workspace) {
+                workspaceId = workspace.id
+                const org = await appServer.AppDataSource.getRepository(Organization).findOneBy({
+                    id: workspace.organizationId
+                })
+                if (org) {
+                    orgId = org.id
+                    subscriptionId = (org.subscriptionId as string) || ''
+                }
+            }
         }
 
-        const orgId = org.id
+        if (!orgId) orgId = 'unknown'
+        if (!workspaceId) workspaceId = ''
         organizationId = orgId
-        const subscriptionId = org.subscriptionId as string
-        const productId = await appServer.identityManager.getProductIdFromSubscription(subscriptionId)
+        const productId = subscriptionId ? await appServer.identityManager.getProductIdFromSubscription(subscriptionId) : ''
 
-        await checkPredictions(orgId, subscriptionId, appServer.usageCacheManager)
+        if (subscriptionId) {
+            await checkPredictions(orgId, subscriptionId, appServer.usageCacheManager)
+        }
 
         const executeData: IExecuteFlowParams = {
             incomingInput, // Use the defensively created incomingInput variable

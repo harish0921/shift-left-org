@@ -57,7 +57,9 @@ export const utilGetChatMessage = async ({
 
     const appServer = getRunningExpressApp()
 
-    // Check if chatflow workspaceId is same as activeWorkspaceId
+    // Validate access context:
+    // - If workspace is available, enforce workspace ownership.
+    // - For internal calls without req.user workspace, allow chatflow-id based lookup.
     if (activeWorkspaceId) {
         const chatflow = await appServer.AppDataSource.getRepository(ChatFlow).findOneBy({
             id: chatflowid,
@@ -67,7 +69,10 @@ export const utilGetChatMessage = async ({
             throw new Error('Unauthorized access')
         }
     } else {
-        throw new Error('Unauthorized access')
+        const chatflow = await appServer.AppDataSource.getRepository(ChatFlow).findOneBy({ id: chatflowid })
+        if (!chatflow) {
+            throw new Error('Chatflow not found')
+        }
     }
 
     if (feedback) {

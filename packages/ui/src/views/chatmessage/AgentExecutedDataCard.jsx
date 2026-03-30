@@ -208,7 +208,6 @@ function CustomLabel({ icon: Icon, itemStatus, children, name, label, data, meta
 CustomLabel.propTypes = {
     icon: PropTypes.elementType,
     itemStatus: PropTypes.string,
-    expandable: PropTypes.bool,
     children: PropTypes.node,
     name: PropTypes.string,
     label: PropTypes.string,
@@ -264,7 +263,6 @@ const CustomTreeItem = forwardRef(function CustomTreeItem(props, ref) {
     } = useTreeItem2({ id, itemId, children, label, disabled, rootRef: ref })
 
     const item = publicAPI.getItem(itemId)
-    const expandable = isExpandable(children)
     let icon
     if (item.status) {
         icon = getIconFromStatus(item.status, theme)
@@ -282,7 +280,6 @@ const CustomTreeItem = forwardRef(function CustomTreeItem(props, ref) {
                         {...getLabelProps({
                             icon,
                             itemStatus: item.status,
-                            expandable: expandable && status.expanded,
                             name: item.name || item.id?.split('_')[0],
                             label: item.label,
                             status,

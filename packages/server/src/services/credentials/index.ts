@@ -36,12 +36,14 @@ const createCredential = async (requestBody: any) => {
 const deleteCredentials = async (credentialId: string, workspaceId: string): Promise<any> => {
     try {
         const appServer = getRunningExpressApp()
-        const dbResponse = await appServer.AppDataSource.getRepository(Credential).delete({ id: credentialId, workspaceId: workspaceId })
+        const deleteWhere = workspaceId ? { id: credentialId, workspaceId } : { id: credentialId }
+        const dbResponse = await appServer.AppDataSource.getRepository(Credential).delete(deleteWhere)
         if (!dbResponse) {
             throw new InternalFlowiseError(StatusCodes.NOT_FOUND, `Credential ${credentialId} not found`)
         }
         return dbResponse
     } catch (error) {
+        if (error instanceof InternalFlowiseError) throw error
         throw new InternalFlowiseError(
             StatusCodes.INTERNAL_SERVER_ERROR,
             `Error: credentialsService.deleteCredential - ${getErrorMessage(error)}`
@@ -90,10 +92,8 @@ const getAllCredentials = async (paramCredentialName: any, workspaceId: string) 
 const getCredentialById = async (credentialId: string, workspaceId: string): Promise<any> => {
     try {
         const appServer = getRunningExpressApp()
-        const credential = await appServer.AppDataSource.getRepository(Credential).findOneBy({
-            id: credentialId,
-            workspaceId: workspaceId
-        })
+        const findWhere = workspaceId ? { id: credentialId, workspaceId } : { id: credentialId }
+        const credential = await appServer.AppDataSource.getRepository(Credential).findOneBy(findWhere)
         if (!credential) {
             throw new InternalFlowiseError(StatusCodes.NOT_FOUND, `Credential ${credentialId} not found`)
         }
@@ -110,6 +110,7 @@ const getCredentialById = async (credentialId: string, workspaceId: string): Pro
         const dbResponse: any = omit(returnCredential, ['encryptedData'])
         return dbResponse
     } catch (error) {
+        if (error instanceof InternalFlowiseError) throw error
         throw new InternalFlowiseError(
             StatusCodes.INTERNAL_SERVER_ERROR,
             `Error: credentialsService.createCredential - ${getErrorMessage(error)}`
@@ -120,21 +121,22 @@ const getCredentialById = async (credentialId: string, workspaceId: string): Pro
 const updateCredential = async (credentialId: string, requestBody: any, workspaceId: string): Promise<any> => {
     try {
         const appServer = getRunningExpressApp()
-        const credential = await appServer.AppDataSource.getRepository(Credential).findOneBy({
-            id: credentialId,
-            workspaceId: workspaceId
-        })
+        const findWhere = workspaceId ? { id: credentialId, workspaceId } : { id: credentialId }
+        const credential = await appServer.AppDataSource.getRepository(Credential).findOneBy(findWhere)
         if (!credential) {
             throw new InternalFlowiseError(StatusCodes.NOT_FOUND, `Credential ${credentialId} not found`)
         }
         const decryptedCredentialData = await decryptCredentialData(credential.encryptedData)
         requestBody.plainDataObj = { ...decryptedCredentialData, ...requestBody.plainDataObj }
         const updateCredential = await transformToCredentialEntity(requestBody)
-        updateCredential.workspaceId = workspaceId
+        if (workspaceId) {
+            updateCredential.workspaceId = workspaceId
+        }
         await appServer.AppDataSource.getRepository(Credential).merge(credential, updateCredential)
         const dbResponse = await appServer.AppDataSource.getRepository(Credential).save(credential)
         return dbResponse
     } catch (error) {
+        if (error instanceof InternalFlowiseError) throw error
         throw new InternalFlowiseError(
             StatusCodes.INTERNAL_SERVER_ERROR,
             `Error: credentialsService.updateCredential - ${getErrorMessage(error)}`

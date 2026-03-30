@@ -282,8 +282,11 @@ export const AsyncDropdown = ({
                         </Tooltip>
                     )
                 }}
-                renderOption={(props, option) => (
-                    <Box component='li' {...props} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                renderOption={(props, option, state) => {
+                    const { key, ...optionProps } = props
+                    const optionKey = `${option?.name || option?.label || 'option'}-${state.index}`
+                    return (
+                    <Box key={optionKey} component='li' {...optionProps} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         {option.imageSrc && (
                             <img
                                 src={option.imageSrc}
@@ -303,7 +306,7 @@ export const AsyncDropdown = ({
                             )}
                         </div>
                     </Box>
-                )}
+                )}}
             />
         </>
     )

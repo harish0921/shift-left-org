@@ -144,6 +144,11 @@ interface IExecuteAgentFlowParams extends Omit<IExecuteFlowParams, 'incomingInpu
     incomingInput: IncomingAgentflowInput
 }
 
+const getWorkspaceSearchOptions = (workspaceId?: string) => {
+    if (workspaceId) return { workspaceId }
+    return {}
+}
+
 const MAX_LOOP_COUNT = process.env.MAX_LOOP_COUNT ? parseInt(process.env.MAX_LOOP_COUNT) : 10
 
 /**
