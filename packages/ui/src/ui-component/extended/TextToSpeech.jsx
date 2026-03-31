@@ -477,7 +477,7 @@ const TextToSpeech = ({ dialogProps }) => {
                                     rel='noreferrer'
                                     href={textToSpeechProviders[selectedProvider].url}
                                     style={{
-                                        color: theme?.customization?.isDarkMode ? '#90caf9' : '#1976d2',
+                                        color: theme?.customization?.isDarkMode ? '#FFB899' : '#FF5C00',
                                         textDecoration: 'underline'
                                     }}
                                 >

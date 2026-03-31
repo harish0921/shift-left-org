@@ -72,11 +72,11 @@ const StyledEditorContent = styled(EditorContent)(({ theme, rows, disabled, isDa
         '--code-bg': isDarkMode ? '#2d2d2d' : '#f5f5f5',
         '--code-color': isDarkMode ? '#d4d4d4' : '#333333',
         '--hljs-comment': isDarkMode ? '#6a9955' : '#6a9955',
-        '--hljs-variable': isDarkMode ? '#9cdcfe' : '#d73a49', // Light blue for variables (var, i)
+        '--hljs-variable': isDarkMode ? '#FFB088' : '#d73a49',
         '--hljs-number': isDarkMode ? '#b5cea8' : '#e36209', // Light green for numbers (1, 20, 15, etc.)
         '--hljs-string': isDarkMode ? '#ce9178' : '#22863a', // Orange/peach for strings ("FizzBuzz", "Fizz", "Buzz")
         '--hljs-title': isDarkMode ? '#dcdcaa' : '#6f42c1', // Yellow for function names (log)
-        '--hljs-keyword': isDarkMode ? '#569cd6' : '#005cc5', // Blue for keywords (for, if, else)
+        '--hljs-keyword': isDarkMode ? '#FF8F5E' : '#E5520F',
         '--hljs-operator': isDarkMode ? '#d4d4d4' : '#333333', // White/gray for operators (=, %, ==, etc.)
         '--hljs-punctuation': isDarkMode ? '#d4d4d4' : '#333333' // White/gray for punctuation ({, }, ;, etc.)
     }

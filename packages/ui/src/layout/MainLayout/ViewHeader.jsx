@@ -47,8 +47,26 @@ const ViewHeader = ({
             >
                 <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
                     {isBackButton && (
-                        <StyledFab sx={{ mr: 3 }} size='small' color='secondary' aria-label='back' title='Back' onClick={onBack}>
-                            <IconArrowLeft />
+                        <StyledFab
+                            sx={{
+                                mr: 3,
+                                bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(26,26,26,0.08)',
+                                color: 'text.secondary',
+                                border: '1px solid',
+                                borderColor: 'divider',
+                                boxShadow: 'none',
+                                '&:hover': {
+                                    bgcolor: 'rgba(255,92,0,0.12)',
+                                    color: 'primary.main',
+                                    borderColor: 'primary.main'
+                                }
+                            }}
+                            size='small'
+                            aria-label='back'
+                            title='Back'
+                            onClick={onBack}
+                        >
+                            <IconArrowLeft style={{ color: 'currentColor' }} />
                         </StyledFab>
                     )}
                     <Box sx={{ display: 'flex', alignItems: 'start', flexDirection: 'column' }}>
@@ -88,8 +106,23 @@ const ViewHeader = ({
                         )}
                     </Box>
                     {isEditButton && (
-                        <IconButton sx={{ ml: 3 }} color='secondary' title='Edit' onClick={onEdit}>
-                            <IconEdit />
+                        <IconButton
+                            sx={{
+                                ml: 3,
+                                color: 'text.secondary',
+                                bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(26,26,26,0.08)',
+                                border: '1px solid',
+                                borderColor: 'divider',
+                                '&:hover': {
+                                    bgcolor: 'rgba(255,92,0,0.12)',
+                                    color: 'primary.main',
+                                    borderColor: 'primary.main'
+                                }
+                            }}
+                            title='Edit'
+                            onClick={onEdit}
+                        >
+                            <IconEdit style={{ color: 'currentColor' }} />
                         </IconButton>
                     )}
                 </Box>

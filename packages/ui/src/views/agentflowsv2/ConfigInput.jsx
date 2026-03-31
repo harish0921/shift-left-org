@@ -302,7 +302,7 @@ export const ConfigInput = ({ data, inputParam, disabled = false, arrayIndex = n
                                     placement='top'
                                 >
                                     <IconButton sx={{ height: 35, width: 35 }}>
-                                        <IconAlertTriangle size={20} color='#0078D4' />
+                                        <IconAlertTriangle size={20} color='#FF6B2C' />
                                     </IconButton>
                                 </Tooltip>
                             )}
@@ -337,3 +337,4 @@ ConfigInput.propTypes = {
     arrayIndex: PropTypes.number,
     parentParamForArray: PropTypes.object
 }
+

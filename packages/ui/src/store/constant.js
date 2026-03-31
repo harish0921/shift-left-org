@@ -51,7 +51,7 @@ export const AGENTFLOW_ICONS = [
     {
         name: 'llmAgentflow',
         icon: IconSparkles,
-        color: '#64B5F6'
+        color: '#FFB899'
     },
     {
         name: 'agentAgentflow',

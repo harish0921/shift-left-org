@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
+import { LoggedInUser } from '../../enterprise/Interface.Enterprise'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import apikeyService from '../../services/apikey'
 import { getPageAndLimitParams } from '../../utils/pagination'
@@ -9,7 +10,7 @@ const getAllApiKeys = async (req: Request, res: Response, next: NextFunction) =>
     try {
         const user = req.user as LoggedInUser
 
-        if (req.query?.type === 'organization' && user?.isOrganizationAdmin)
+        if (req.query?.type === 'organization' && user.isOrganizationAdmin)
             return res.status(StatusCodes.OK).json(await apikeyService.getAllApiKeysByOrganization(user.activeOrganizationId))
 
         const { page, limit } = getPageAndLimitParams(req)

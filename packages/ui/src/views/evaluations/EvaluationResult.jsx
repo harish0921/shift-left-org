@@ -430,7 +430,7 @@ const EvalEvaluationRows = () => {
                                 }}
                             >
                                 <Box sx={{ p: 2 }}>
-                                    <IconAlertTriangle size={25} color='#0078D4' />
+                                    <IconAlertTriangle size={25} color='#FF6B2C' />
                                 </Box>
                                 <Stack flexDirection='column'>
                                     <span style={{ color: 'rgb(116,66,16)' }}>
@@ -1048,3 +1048,4 @@ const EvalEvaluationRows = () => {
 }
 
 export default EvalEvaluationRows
+

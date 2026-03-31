@@ -73,7 +73,15 @@ const MainLayout = () => {
     }, [matchDownMd])
 
     return (
-        <Box sx={{ display: 'flex' }}>
+        <Box
+            sx={{
+                display: 'flex',
+                background:
+                    theme.palette.mode === 'light'
+                        ? 'linear-gradient(180deg, #FFFFFF 0%, #FFF9F5 55%, #FFF3EB 100%)'
+                        : 'radial-gradient(circle at 15% 15%, rgba(255,92,0,0.12) 0%, rgba(255,92,0,0) 30%), #07090C'
+            }}
+        >
             <CssBaseline />
             {/* header */}
             <AppBar
@@ -82,11 +90,13 @@ const MainLayout = () => {
                 color='inherit'
                 elevation={0}
                 sx={{
-                    bgcolor: theme.palette.background.default,
+                    bgcolor: theme.palette.mode === 'light' ? '#FFF7F0' : 'rgba(8,11,16,0.68)',
+                    backdropFilter: theme.palette.mode === 'dark' ? 'blur(16px)' : 'none',
+                    WebkitBackdropFilter: theme.palette.mode === 'dark' ? 'blur(16px)' : 'none',
                     transition: leftDrawerOpened ? theme.transitions.create('width') : 'none'
                 }}
             >
-                <Toolbar sx={{ height: `${headerHeight}px`, borderBottom: '1px solid', borderColor: theme.palette.grey[900] + 25 }}>
+                <Toolbar sx={{ height: `${headerHeight}px`, borderBottom: '1px solid', borderColor: theme.palette.mode === 'light' ? '#FFDCC8' : 'rgba(255,255,255,0.08)' }}>
                     <Header handleLeftDrawerToggle={handleLeftDrawerToggle} />
                 </Toolbar>
             </AppBar>
@@ -103,3 +113,4 @@ const MainLayout = () => {
 }
 
 export default MainLayout
+

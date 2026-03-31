@@ -197,7 +197,7 @@ const DeleteDocStoreDialog = ({ show, dialogProps, onCancel, onDelete }) => {
                             padding: 10
                         }}
                     >
-                        <IconAlertTriangle size={70} color='#0078D4' />
+                        <IconAlertTriangle size={70} color='#FF6B2C' />
                         <span style={{ color: 'rgb(116,66,16)', marginLeft: 10 }}>
                             <strong>Note:</strong> Without a Record Manager configured, only the document chunks will be removed from the
                             document store. The actual vector embeddings in your vector store database will remain unchanged. To enable
@@ -314,3 +314,4 @@ DeleteDocStoreDialog.propTypes = {
 }
 
 export default DeleteDocStoreDialog
+

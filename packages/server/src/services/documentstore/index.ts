@@ -44,6 +44,7 @@ import { ChatFlow } from '../../database/entities/ChatFlow'
 import { DocumentStore } from '../../database/entities/DocumentStore'
 import { DocumentStoreFileChunk } from '../../database/entities/DocumentStoreFileChunk'
 import { UpsertHistory } from '../../database/entities/UpsertHistory'
+import { getWorkspaceSearchOptions } from '../../enterprise/utils/ControllerServiceUtils'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getErrorMessage } from '../../errors/utils'
 import { validateFileMimeTypeAndExtensionMatch } from '../../utils/fileValidation'
@@ -55,13 +56,6 @@ import { DOCUMENTSTORE_TOOL_DESCRIPTION_PROMPT_GENERATOR } from '../../utils/pro
 import { checkStorage, updateStorageUsage } from '../../utils/quotaUsage'
 import { Telemetry } from '../../utils/telemetry'
 import nodesService from '../nodes'
-
-const getWorkspaceSearchOptionsSafe = (workspaceId?: string) => {
-    if (typeof getWorkspaceSearchOptions === 'function') {
-        return getWorkspaceSearchOptions(workspaceId)
-    }
-    return workspaceId ? { workspaceId } : {}
-}
 
 const createDocumentStore = async (newDocumentStore: DocumentStore, orgId: string) => {
     try {
@@ -1102,9 +1096,9 @@ const updateDocumentStoreUsage = async (chatId: string, storeId: string | undefi
         // find the document store
         const appServer = getRunningExpressApp()
         // find all entities that have the chatId in their whereUsed
-        const entities = await appServer.AppDataSource.getRepository(DocumentStore).findBy(getWorkspaceSearchOptionsSafe(workspaceId))
-        for (const entity of entities) {
-            const whereUsed = entity.whereUsed ? JSON.parse(entity.whereUsed) : []
+        const entities = await appServer.AppDataSource.getRepository(DocumentStore).findBy(getWorkspaceSearchOptions(workspaceId))
+        entities.map(async (entity: DocumentStore) => {
+            const whereUsed = JSON.parse(entity.whereUsed)
             const found = whereUsed.find((w: string) => w === chatId)
             if (found) {
                 if (!storeId) {
@@ -1134,7 +1128,7 @@ const updateDocumentStoreUsage = async (chatId: string, storeId: string | undefi
                     await appServer.AppDataSource.getRepository(DocumentStore).save(entity)
                 }
             }
-        }
+        })
     } catch (error) {
         throw new InternalFlowiseError(
             StatusCodes.INTERNAL_SERVER_ERROR,

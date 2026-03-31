@@ -3,7 +3,96 @@
 
 // third-party
 @import 'react-perfect-scrollbar/dist/css/styles.css';
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');
 
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    min-height: 100vh;
+    font-family: 'JetBrains Mono', 'Courier New', monospace !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body[data-theme='light'] {
+    background: linear-gradient(180deg, #ffffff 0%, #fff9f5 55%, #fff3eb 100%);
+    color: #1a1a1a;
+}
+
+body[data-theme='dark'] {
+    background: radial-gradient(circle at 15% 15%, rgba(255, 92, 0, 0.14) 0%, rgba(255, 92, 0, 0) 34%),
+        radial-gradient(circle at 85% 0%, rgba(255, 122, 51, 0.1) 0%, rgba(255, 122, 51, 0) 30%), #07090c;
+    color: #f5f5f5;
+}
+
+body[data-theme='dark'] #root {
+    background: transparent;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'JetBrains Mono', 'Courier New', monospace !important;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.MuiCard-root {
+    animation: scaleIn 0.3s ease both;
+}
+
+main > * {
+    animation: fadeInUp 0.35s ease both;
+}
+
+.MuiGrid-container {
+    animation: fadeInUp 0.4s ease both;
+}
+
+button,
+a,
+.MuiListItemButton-root,
+.MuiIconButton-root {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
 // ==============================|| LIGHT BOX ||============================== //
 .fullscreen .react-images__blanket {
     z-index: 1200;
@@ -156,7 +245,7 @@
 
         .hljs-variable,
         .hljs-name {
-            color: var(--hljs-variable, #9cdcfe) !important; /* Light blue for variables */
+            color: var(--hljs-variable, #ffb088) !important;
         }
 
         .hljs-number,
@@ -176,7 +265,7 @@
 
         .hljs-keyword,
         .hljs-selector-tag {
-            color: var(--hljs-keyword, #569cd6) !important; /* Blue for keywords */
+            color: var(--hljs-keyword, #ff8f5e) !important;
         }
 
         /* Additional elements that should match the base text color */
@@ -220,3 +309,9 @@
         transform: rotate(360deg);
     }
 }
+
+
+
+
+
+

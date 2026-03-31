@@ -1,6 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 import { v4 as uuidv4 } from 'uuid'
 import { ApiKey } from '../../database/entities/ApiKey'
+import { LoggedInUser } from '../../enterprise/Interface.Enterprise'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getErrorMessage } from '../../errors/utils'
 import { Platform } from '../../Interface'
@@ -105,7 +106,7 @@ async function getAllApiKeysByOrganization(organizationId: string): Promise<ApiK
  * Get all API keys for a workspace
  * Non-admin users can only view API keys whose permissions are a subset of their own permissions
  */
-const getAllApiKeys = async (user: LoggedInUser | undefined, page: number = -1, limit: number = -1) => {
+const getAllApiKeys = async (user: LoggedInUser, page: number = -1, limit: number = -1) => {
     try {
         const appServer = getRunningExpressApp()
         const queryBuilder = appServer.AppDataSource.getRepository(ApiKey)
@@ -115,14 +116,12 @@ const getAllApiKeys = async (user: LoggedInUser | undefined, page: number = -1, 
             queryBuilder.skip((page - 1) * limit)
             queryBuilder.take(limit)
         }
-        if (user?.activeWorkspaceId) {
-            queryBuilder.andWhere('api_key.workspaceId = :workspaceId', { workspaceId: user.activeWorkspaceId })
-        }
+        queryBuilder.andWhere('api_key.workspaceId = :workspaceId', { workspaceId: user.activeWorkspaceId })
         const allKeys = await queryBuilder.getMany()
 
         // Filter keys based on user permissions
         let filteredKeys = allKeys
-        if (user && !user.isOrganizationAdmin) {
+        if (!user.isOrganizationAdmin) {
             // Non-admin users can only see API keys whose permissions are a subset of their own
             filteredKeys = allKeys.filter((key) => {
                 // Check if all key permissions are included in user permissions

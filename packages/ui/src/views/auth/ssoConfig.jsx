@@ -431,7 +431,7 @@ const SSOConfigPage = () => {
                                 }}
                             >
                                 <Box sx={{ pl: 2 }}>
-                                    <IconAlertTriangle size={25} color='#0078D4' />
+                                    <IconAlertTriangle size={25} color='#FF6B2C' />
                                 </Box>
                                 <Stack flexDirection='column'>
                                     <span style={{ color: 'rgb(116,66,16)' }}>
@@ -1031,3 +1031,4 @@ const SSOConfigPage = () => {
 }
 
 export default SSOConfigPage
+

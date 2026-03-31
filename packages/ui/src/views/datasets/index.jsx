@@ -211,7 +211,7 @@ const EvalDatasets = () => {
                             <StyledPermissionButton
                                 permissionId={'datasets:create'}
                                 variant='contained'
-                                sx={{ borderRadius: 2, height: '100%', whiteSpace: 'nowrap', backgroundColor: '#0078D4' }}
+                                sx={{ borderRadius: 2, height: '100%', whiteSpace: 'nowrap', backgroundColor: '#FF6B2C' }}
                                 onClick={addNew}
                                 startIcon={<IconPlus />}
                             >
@@ -366,3 +366,4 @@ const EvalDatasets = () => {
 }
 
 export default EvalDatasets
+

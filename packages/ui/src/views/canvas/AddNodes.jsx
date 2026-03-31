@@ -547,7 +547,7 @@ const AddNodes = ({ nodesData, node, isAgentCanvas, isAgentflowv2, onFlowGenerat
                                                                             position: 'absolute',
                                                                             top: '-4px',
                                                                             right: '-6px',
-                                                                            backgroundColor: '#0078D4',
+                                                                            backgroundColor: '#FF6B2C',
                                                                             color: 'white',
                                                                             borderRadius: '50%',
                                                                             width: '12px',
@@ -784,3 +784,4 @@ AddNodes.propTypes = {
 }
 
 export default memo(AddNodes)
+

@@ -131,7 +131,7 @@ const ItemCard = ({ data, images, icons, onClick }) => {
                                                     borderRadius: '50%',
                                                     backgroundColor: customization.isDarkMode
                                                         ? theme.palette.common.white
-                                                        : theme.palette.grey[300] + 75
+                                                        : 'rgba(255, 92, 0, 0.12)'
                                                 }}
                                             >
                                                 <img
@@ -150,7 +150,7 @@ const ItemCard = ({ data, images, icons, onClick }) => {
                                                     justifyContent: 'center'
                                                 }}
                                             >
-                                                <item.icon size={25} color={item.color} />
+                                                <item.icon size={25} color={customization.isDarkMode ? item.color : '#FF7A33'} />
                                             </div>
                                         )}
                                     </Tooltip>

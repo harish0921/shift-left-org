@@ -1,9 +1,8 @@
 import { HarmBlockThreshold, HarmCategory } from '@google/generative-ai'
 import type { SafetySetting } from '@google/generative-ai'
 import { BaseCache } from '@langchain/core/caches'
-import { ICommonObject, IMultiModalOption, INode, INodeData, INodeOptionsValue, INodeParams } from '../../../src/Interface'
+import { ICommonObject, IMultiModalOption, INode, INodeData, INodeParams } from '../../../src/Interface'
 import { getBaseClasses, getCredentialData, getCredentialParam } from '../../../src/utils'
-import { getModels, MODEL_TYPE } from '../../../src/modelLoader'
 import { GoogleGenerativeAIChatInput } from '@langchain/google-genai'
 import { ChatGoogleGenerativeAI } from './FlowiseChatGoogleGenerativeAI'
 
@@ -46,9 +45,34 @@ class GoogleGenerativeAI_ChatModels implements INode {
             {
                 label: 'Model Name',
                 name: 'modelName',
-                type: 'asyncOptions',
-                loadMethod: 'listModels',
-                default: 'gemini-1.5-flash-latest'
+                type: 'options',
+                options: [
+                    {
+                        label: 'gemini-2.0-flash (Latest - Recommended)',
+                        name: 'gemini-2.0-flash'
+                    },
+                    {
+                        label: 'gemini-2.0-flash-lite (Fast & Free)',
+                        name: 'gemini-2.0-flash-lite'
+                    },
+                    {
+                        label: 'gemini-2.5-pro-preview',
+                        name: 'gemini-2.5-pro-preview-03-25'
+                    },
+                    {
+                        label: 'gemini-1.5-pro',
+                        name: 'gemini-1.5-pro'
+                    },
+                    {
+                        label: 'gemini-1.5-flash-latest',
+                        name: 'gemini-1.5-flash-latest'
+                    },
+                    {
+                        label: 'gemini-1.5-flash-8b',
+                        name: 'gemini-1.5-flash-8b'
+                    }
+                ],
+                default: 'gemini-2.0-flash'
             },
             {
                 label: 'Custom Model Name',
@@ -233,13 +257,6 @@ class GoogleGenerativeAI_ChatModels implements INode {
         ]
     }
 
-    //@ts-ignore
-    loadMethods = {
-        async listModels(): Promise<INodeOptionsValue[]> {
-            return await getModels(MODEL_TYPE.CHAT, 'chatGoogleGenerativeAI')
-        }
-    }
-
     async init(nodeData: INodeData, _: string, options: ICommonObject): Promise<any> {
         const credentialData = await getCredentialData(nodeData.credential ?? '', options)
         const apiKey = getCredentialParam('googleGenerativeAPIKey', credentialData, nodeData)
@@ -260,15 +277,23 @@ class GoogleGenerativeAI_ChatModels implements INode {
 
         const allowImageUploads = nodeData.inputs?.allowImageUploads as boolean
 
+        const deprecatedModelFallbacks: Record<string, string> = {
+            'gemini-1.5-flash': 'gemini-2.0-flash',
+            'gemini-pro': 'gemini-2.0-flash',
+            'gemini-1.0-pro': 'gemini-2.0-flash'
+        }
+        const selectedModelName = customModelName || modelName || 'gemini-2.0-flash'
+        const resolvedModelName = deprecatedModelFallbacks[selectedModelName] ?? selectedModelName
+
         const obj: GoogleGenerativeAIChatInput = {
             apiKey: apiKey,
-            model: customModelName || modelName,
+            model: resolvedModelName,
             streaming: streaming ?? true
         }
 
         // this extra metadata is needed, as langchain does not show the model name in the callbacks.
         obj.metadata = {
-            fw_model_name: customModelName || modelName
+            fw_model_name: resolvedModelName
         }
         if (maxOutputTokens) obj.maxOutputTokens = parseInt(maxOutputTokens, 10)
         if (topP) obj.topP = parseFloat(topP)

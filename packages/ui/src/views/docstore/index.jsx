@@ -195,7 +195,7 @@ const Documents = () => {
                         <StyledPermissionButton
                             permissionId={'documentStores:create'}
                             variant='contained'
-                            sx={{ borderRadius: 2, height: '100%', whiteSpace: 'nowrap', backgroundColor: '#0078D4' }}
+                            sx={{ borderRadius: 2, height: '100%', whiteSpace: 'nowrap', backgroundColor: '#FF6B2C' }}
                             onClick={addNew}
                             startIcon={<IconPlus />}
                             id='btn_createVariable'
@@ -254,3 +254,4 @@ const Documents = () => {
 }
 
 export default Documents
+

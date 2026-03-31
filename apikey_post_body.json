@@ -1,0 +1,1 @@
+{"statusCode":412,"success":false,"message":"Error: apikeyController.createApiKey - permissions must be an array of strings!","stack":{}}

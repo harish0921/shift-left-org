@@ -26,11 +26,11 @@ const MarketplaceCanvasHeader = ({ flowName, flowData, onChatflowCopy }) => {
                             ...theme.typography.commonAvatar,
                             ...theme.typography.mediumAvatar,
                             transition: 'all .2s ease-in-out',
-                            background: theme.palette.secondary.light,
-                            color: theme.palette.secondary.dark,
+                            background: theme.palette.canvasHeader.saveLight,
+                            color: theme.palette.canvasHeader.saveDark,
                             '&:hover': {
-                                background: theme.palette.secondary.dark,
-                                color: theme.palette.secondary.light
+                                background: theme.palette.canvasHeader.saveDark,
+                                color: theme.palette.canvasHeader.saveLight
                             }
                         }}
                         color='inherit'

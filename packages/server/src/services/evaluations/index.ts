@@ -13,17 +13,13 @@ import { ApiKey } from '../../database/entities/ApiKey'
 import { ChatFlow } from '../../database/entities/ChatFlow'
 import { getAppVersion } from '../../utils'
 import { In } from 'typeorm'
+import { getWorkspaceSearchOptions } from '../../enterprise/utils/ControllerServiceUtils'
 import { v4 as uuidv4 } from 'uuid'
 import { calculateCost, formatCost } from './CostCalculator'
 import { runAdditionalEvaluators } from './EvaluatorRunner'
 import evaluatorsService from '../evaluator'
 import { LLMEvaluationRunner } from './LLMEvaluationRunner'
 import { Assistant } from '../../database/entities/Assistant'
-
-const getWorkspaceSearchOptions = (workspaceId?: string) => {
-    if (workspaceId) return { workspaceId }
-    return {}
-}
 
 const runAgain = async (id: string, baseURL: string, orgId: string, workspaceId: string) => {
     try {
@@ -378,9 +374,7 @@ const getAllEvaluations = async (workspaceId: string, page: number = -1, limit: 
         const countQuery = appServer.AppDataSource.getRepository(Evaluation)
             .createQueryBuilder('ev')
             .select('COUNT(DISTINCT(ev.name))', 'count')
-        if (workspaceId) {
-            countQuery.where('ev.workspaceId = :workspaceId', { workspaceId })
-        }
+            .where('ev.workspaceId = :workspaceId', { workspaceId: workspaceId })
 
         const totalResult = await countQuery.getRawOne()
         const total = totalResult ? parseInt(totalResult.count) : 0
@@ -391,11 +385,9 @@ const getAllEvaluations = async (workspaceId: string, page: number = -1, limit: 
             .select('DISTINCT(ev.name)', 'name')
             .addSelect('COUNT(ev.name)', 'count')
             .addSelect('MAX(ev.runDate)', 'latestRunDate')
+            .andWhere('ev.workspaceId = :workspaceId', { workspaceId: workspaceId })
             .groupBy('ev.name')
             .orderBy('max(ev.runDate)', 'DESC') // Order by the latest run date
-        if (workspaceId) {
-            namesQueryBuilder.andWhere('ev.workspaceId = :workspaceId', { workspaceId })
-        }
 
         if (page > 0 && limit > 0) {
             namesQueryBuilder.skip((page - 1) * limit)
@@ -412,17 +404,15 @@ const getAllEvaluations = async (workspaceId: string, page: number = -1, limit: 
             const allEvaluations = await appServer.AppDataSource.getRepository(Evaluation)
                 .createQueryBuilder('ev')
                 .where('ev.name IN (:...names)', { names })
+                .andWhere('ev.workspaceId = :workspaceId', { workspaceId })
                 .orderBy('ev.name', 'ASC')
                 .addOrderBy('ev.runDate', 'DESC')
-            if (workspaceId) {
-                allEvaluations.andWhere('ev.workspaceId = :workspaceId', { workspaceId })
-            }
-            const allEvaluationsResult = await allEvaluations.getMany()
+                .getMany()
 
             // Process the results by name
             const evaluationsByName = new Map<string, Evaluation[]>()
             // Group evaluations by name
-            for (const evaluation of allEvaluationsResult) {
+            for (const evaluation of allEvaluations) {
                 if (!evaluationsByName.has(evaluation.name)) {
                     evaluationsByName.set(evaluation.name, [])
                 }

@@ -62,6 +62,17 @@ const CanvasHeader = ({ chatflow, isAgentCanvas, isAgentflowV2, handleSaveFlow, 
     const closeSnackbar = (...args) => dispatch(closeSnackbarAction(...args))
 
     const [savePermission, setSavePermission] = useState(isAgentCanvas ? 'agentflows:create' : 'chatflows:create')
+    const canvasOrangeIconStyle = {
+        ...theme.typography.commonAvatar,
+        ...theme.typography.mediumAvatar,
+        transition: 'all .2s ease-in-out',
+        background: theme.palette.canvasHeader.saveLight,
+        color: theme.palette.canvasHeader.saveDark,
+        '&:hover': {
+            background: theme.palette.canvasHeader.saveDark,
+            color: theme.palette.canvasHeader.saveLight
+        }
+    }
 
     const title = isAgentCanvas ? 'Agents' : 'Chatflow'
 
@@ -256,17 +267,7 @@ const CanvasHeader = ({ chatflow, isAgentCanvas, isAgentflowV2, handleSaveFlow, 
                         <ButtonBase title='Back' sx={{ borderRadius: '50%' }}>
                             <Avatar
                                 variant='rounded'
-                                sx={{
-                                    ...theme.typography.commonAvatar,
-                                    ...theme.typography.mediumAvatar,
-                                    transition: 'all .2s ease-in-out',
-                                    background: theme.palette.secondary.light,
-                                    color: theme.palette.secondary.dark,
-                                    '&:hover': {
-                                        background: theme.palette.secondary.dark,
-                                        color: theme.palette.secondary.light
-                                    }
-                                }}
+                                sx={canvasOrangeIconStyle}
                                 color='inherit'
                                 onClick={() => {
                                     if (window.history.state && window.history.state.idx > 0) {
@@ -293,7 +294,7 @@ const CanvasHeader = ({ chatflow, isAgentCanvas, isAgentflowV2, handleSaveFlow, 
                                         whiteSpace: 'nowrap'
                                     }}
                                 >
-                                    {canvas.isDirty && <strong style={{ color: '#0078D4' }}>*</strong>} {flowName}
+                                    {canvas.isDirty && <strong style={{ color: '#FF6B2C' }}>*</strong>} {flowName}
                                 </Typography>
                                 {chatflow?.id && (
                                     <Available permission={savePermission}>
@@ -301,16 +302,8 @@ const CanvasHeader = ({ chatflow, isAgentCanvas, isAgentflowV2, handleSaveFlow, 
                                             <Avatar
                                                 variant='rounded'
                                                 sx={{
-                                                    ...theme.typography.commonAvatar,
-                                                    ...theme.typography.mediumAvatar,
-                                                    transition: 'all .2s ease-in-out',
                                                     ml: 1,
-                                                    background: theme.palette.secondary.light,
-                                                    color: theme.palette.secondary.dark,
-                                                    '&:hover': {
-                                                        background: theme.palette.secondary.dark,
-                                                        color: theme.palette.secondary.light
-                                                    }
+                                                    ...canvasOrangeIconStyle
                                                 }}
                                                 color='inherit'
                                                 onClick={() => setEditingFlowName(true)}
@@ -435,17 +428,7 @@ const CanvasHeader = ({ chatflow, isAgentCanvas, isAgentflowV2, handleSaveFlow, 
                     <ButtonBase ref={settingsRef} title='Settings' sx={{ borderRadius: '50%' }}>
                         <Avatar
                             variant='rounded'
-                            sx={{
-                                ...theme.typography.commonAvatar,
-                                ...theme.typography.mediumAvatar,
-                                transition: 'all .2s ease-in-out',
-                                background: theme.palette.canvasHeader.settingsLight,
-                                color: theme.palette.canvasHeader.settingsDark,
-                                '&:hover': {
-                                    background: theme.palette.canvasHeader.settingsDark,
-                                    color: theme.palette.canvasHeader.settingsLight
-                                }
-                            }}
+                            sx={canvasOrangeIconStyle}
                             onClick={() => setSettingsOpen(!isSettingsOpen)}
                         >
                             <IconSettings stroke={1.5} size='1.3rem' />
@@ -512,3 +495,4 @@ CanvasHeader.propTypes = {
 }
 
 export default CanvasHeader
+

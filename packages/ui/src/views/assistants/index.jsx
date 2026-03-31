@@ -18,7 +18,7 @@ const cards = [
         description: 'Create custom assistant using your choice of LLMs',
         icon: <IconRobotFace />,
         iconText: 'Custom',
-        gradient: 'linear-gradient(135deg, #e8f4fd 0%, #bbdefb 100%)'
+        gradient: 'linear-gradient(135deg, #FFF3EE 0%, #FFB899 100%)'
     },
     {
         title: 'OpenAI Assistant',

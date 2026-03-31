@@ -12,9 +12,9 @@
                    ],
     "scripts":  {
                     "preinstall":  "npx only-allow pnpm",
-                    "dev":  "concurrently \"pnpm --filter shiftleft-server dev\" \"pnpm --filter shiftleft-ui dev\"",
-                    "build":  "pnpm --filter @flowiseai/components build \u0026\u0026 pnpm --filter shiftleft-server build \u0026\u0026 pnpm --filter shiftleft-ui build",
-                    "start":  "pnpm --filter shiftleft-server start",
+                    "dev":  "concurrently \"pnpm --filter flowise dev\" \"pnpm --filter shiftleft-ui dev\"",
+                    "build":  "pnpm --filter @flowiseai/components build \u0026\u0026 pnpm --filter flowise build \u0026\u0026 pnpm --filter shiftleft-ui build",
+                    "start":  "pnpm --filter flowise start",
                     "clean":  "pnpm -r exec rm -rf node_modules dist build"
                 },
     "lint-staged":  {

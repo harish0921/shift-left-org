@@ -966,7 +966,7 @@ const NodeInputHandler = ({
                                     marginBottom: 10
                                 }}
                             >
-                                <IconAlertTriangle size={30} color='#0078D4' />
+                                <IconAlertTriangle size={30} color='#FF6B2C' />
                                 <span style={{ color: 'rgb(116,66,16)', marginLeft: 10 }}>{parser(inputParam.warning)}</span>
                             </div>
                         )}
@@ -1442,3 +1442,4 @@ NodeInputHandler.propTypes = {
 }
 
 export default NodeInputHandler
+

@@ -344,7 +344,7 @@ curl -X POST ${baseURL}/api/v1/document-store/upsert/${dialogProps.storeId} \\
                     <IconInfoCircle
                         size={20}
                         style={{
-                            color: customization.isDarkMode ? '#64b5f6' : '#1976d2',
+                            color: customization.isDarkMode ? '#FFB899' : '#FF5C00',
                             flexShrink: 0
                         }}
                     />

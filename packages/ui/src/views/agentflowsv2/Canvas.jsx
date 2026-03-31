@@ -782,9 +782,9 @@ const AgentflowCanvas = () => {
                                             left: 60,
                                             top: 20,
                                             color: 'white',
-                                            background: '#0078D4',
+                                            background: '#FF6B2C',
                                             '&:hover': {
-                                                background: '#0078D4',
+                                                background: '#FF6B2C',
                                                 backgroundImage: `linear-gradient(rgb(0 0 0/10%) 0 0)`
                                             }
                                         }}
@@ -809,3 +809,4 @@ const AgentflowCanvas = () => {
 }
 
 export default AgentflowCanvas
+

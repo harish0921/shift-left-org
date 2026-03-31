@@ -1,8 +1,11 @@
 import logo from '@/assets/images/shiftleft-logo.svg'
+import { useTheme } from '@mui/material/styles'
 
 // ==============================|| LOGO ||============================== //
 
 const Logo = () => {
+    const theme = useTheme()
+
     return (
         <div style={{ alignItems: 'center', display: 'flex', flexDirection: 'row', marginLeft: '10px' }}>
             <img
@@ -12,9 +15,29 @@ const Logo = () => {
                 width={36}
                 height={36}
             />
-            <span style={{ fontSize: '20px', letterSpacing: '-0.5px', marginLeft: '10px' }}>
-                <span style={{ fontWeight: 400, color: '#1A1A1A' }}>Shift</span>
-                <span style={{ fontWeight: 700, color: '#0078D4' }}>Left</span>
+            <span
+                style={{
+                    marginLeft: '10px',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontWeight: 700,
+                    fontSize: '18px',
+                    letterSpacing: '-0.2px'
+                }}
+            >
+                <span
+                    style={{
+                        color: theme.palette.text.primary
+                    }}
+                >
+                    Shift
+                </span>
+                <span
+                    style={{
+                        color: '#FF5C00'
+                    }}
+                >
+                    Left
+                </span>
             </span>
         </div>
     )

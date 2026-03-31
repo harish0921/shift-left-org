@@ -15,9 +15,7 @@ import OrgWorkspaceBreadcrumbs from '@/layout/MainLayout/Header/OrgWorkspaceBrea
 import PricingDialog from '@/ui-component/subscription/PricingDialog'
 
 // assets
-import { IconMenu2, IconX, IconSparkles } from '@tabler/icons-react'
-import DarkModeIcon from '@mui/icons-material/DarkMode'
-import LightModeIcon from '@mui/icons-material/LightMode'
+import { IconMenu2, IconX, IconSparkles, IconMoon, IconSun } from '@tabler/icons-react'
 
 // store
 import { store } from '@/store'
@@ -114,11 +112,11 @@ const Header = ({ handleLeftDrawerToggle }) => {
                                 ...theme.typography.commonAvatar,
                                 ...theme.typography.mediumAvatar,
                                 transition: 'all .2s ease-in-out',
-                                background: theme.palette.secondary.light,
-                                color: theme.palette.secondary.dark,
+                                background: theme.palette.mode === 'dark' ? theme.palette.grey[200] : '#FFF3EE',
+                                color: theme.palette.text.secondary,
                                 '&:hover': {
-                                    background: theme.palette.secondary.dark,
-                                    color: theme.palette.secondary.light
+                                    background: theme.palette.action.hover,
+                                    color: theme.palette.primary.main
                                 }
                             }}
                             onClick={handleLeftDrawerToggle}
@@ -172,8 +170,15 @@ const Header = ({ handleLeftDrawerToggle }) => {
                 />
             )}
             <Tooltip title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}>
-                <IconButton onClick={changeDarkMode} color='inherit' size='large'>
-                    {isDark ? <LightModeIcon /> : <DarkModeIcon />}
+                <IconButton
+                    onClick={changeDarkMode}
+                    size='large'
+                    sx={{
+                        color: isDark ? '#AAAAAA' : '#6B6B6B',
+                        '&:hover': { color: '#FF5C00', backgroundColor: 'rgba(255,92,0,0.08)' }
+                    }}
+                >
+                    {isDark ? <IconSun size={20} /> : <IconMoon size={20} />}
                 </IconButton>
             </Tooltip>
             <Box sx={{ ml: 2 }}></Box>
@@ -187,3 +192,4 @@ Header.propTypes = {
 }
 
 export default Header
+

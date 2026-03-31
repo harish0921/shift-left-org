@@ -318,7 +318,7 @@ const AgentFlowNode = ({ data }) => {
                                 left: -10
                             }}
                         >
-                            <IconAlertCircleFilled color='#0078D4' />
+                            <IconAlertCircleFilled color='#FF6B2C' />
                         </Avatar>
                     </Tooltip>
                 )}
@@ -668,3 +668,4 @@ AgentFlowNode.propTypes = {
 }
 
 export default memo(AgentFlowNode)
+
