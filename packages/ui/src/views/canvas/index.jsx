@@ -567,7 +567,9 @@ const Canvas = () => {
                     color='inherit'
                     elevation={1}
                     sx={{
-                        bgcolor: theme.palette.background.default
+                        bgcolor: customization.isDarkMode ? 'rgba(17,17,17,0.92)' : '#FFFFFF',
+                        backdropFilter: 'blur(12px)',
+                        borderBottom: customization.isDarkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid #E8E8E4'
                     }}
                 >
                     <Toolbar>
@@ -601,10 +603,10 @@ const Canvas = () => {
                                 minZoom={0.1}
                                 snapGrid={[25, 25]}
                                 snapToGrid={isSnappingEnabled}
-                                className='chatflow-canvas'
+                                className={`chatflow-canvas ${customization.isDarkMode ? 'dark-mode' : 'light-mode'}`}
                             >
                                 <Controls
-                                    className={customization.isDarkMode ? 'dark-mode-controls' : ''}
+                                    className={customization.isDarkMode ? 'dark-mode-controls' : 'light-mode-controls'}
                                     style={{
                                         display: 'flex',
                                         flexDirection: 'row',
@@ -633,7 +635,9 @@ const Canvas = () => {
                                         {isBackgroundEnabled ? <IconArtboard /> : <IconArtboardOff />}
                                     </button>
                                 </Controls>
-                                {isBackgroundEnabled && <Background color='#aaa' gap={16} />}
+                                {isBackgroundEnabled && (
+                                    <Background color={customization.isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'} gap={16} />
+                                )}
                                 <AddNodes isAgentCanvas={isAgentCanvas} nodesData={getNodesApi.data} node={selectedNode} />
                                 {isSyncNodesButtonEnabled && (
                                     <Fab
@@ -641,9 +645,9 @@ const Canvas = () => {
                                             left: 40,
                                             top: 20,
                                             color: 'white',
-                                            background: '#0078D4',
+                                            background: '#FF5C00',
                                             '&:hover': {
-                                                background: '#0078D4',
+                                                background: '#FF7A33',
                                                 backgroundImage: `linear-gradient(rgb(0 0 0/10%) 0 0)`
                                             }
                                         }}
@@ -668,3 +672,4 @@ const Canvas = () => {
 }
 
 export default Canvas
+

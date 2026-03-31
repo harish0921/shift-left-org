@@ -408,7 +408,7 @@ const CreateEvaluationDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                                 minHeight: 40,
                                 flexDirection: 'row',
                                 alignItems: 'center',
-                                backgroundColor: '#0078D4',
+                                backgroundColor: '#FF6B2C',
                                 color: 'white',
                                 padding: 10
                             }}
@@ -705,3 +705,4 @@ CreateEvaluationDialog.propTypes = {
 }
 
 export default CreateEvaluationDialog
+

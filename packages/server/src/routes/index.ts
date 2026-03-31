@@ -1,4 +1,5 @@
 import express from 'express'
+import authRouter from './auth'
 import apikeyRouter from './apikey'
 import assistantsRouter from './assistants'
 import attachmentsRouter from './attachments'
@@ -60,6 +61,7 @@ import { IdentityManager } from '../IdentityManager'
 const router = express.Router()
 
 router.use('/ping', pingRouter)
+router.use('/auth', authRouter)
 router.use('/apikey', apikeyRouter)
 router.use('/assistants', assistantsRouter)
 router.use('/attachments', attachmentsRouter)

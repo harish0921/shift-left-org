@@ -179,7 +179,7 @@ const Chatflows = () => {
                             variant='contained'
                             onClick={addNew}
                             startIcon={<IconPlus />}
-                            sx={{ borderRadius: 2, height: 40, whiteSpace: 'nowrap', backgroundColor: '#0078D4' }}
+                            sx={{ borderRadius: 2, height: 40, whiteSpace: 'nowrap', backgroundColor: '#FF6B2C' }}
                         >
                             Add New
                         </StyledPermissionButton>
@@ -236,3 +236,4 @@ const Chatflows = () => {
 }
 
 export default Chatflows
+

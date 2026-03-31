@@ -393,17 +393,23 @@ const ProfileSection = ({ handleLogout }) => {
                         ...theme.typography.commonAvatar,
                         ...theme.typography.mediumAvatar,
                         transition: 'all .2s ease-in-out',
-                        background: theme.palette.secondary.light,
-                        color: theme.palette.secondary.dark,
+                        background: theme.palette.mode === 'dark' ? theme.palette.grey[200] : '#FFF3EE',
+                        color: theme.palette.text.secondary,
                         '&:hover': {
-                            background: theme.palette.secondary.dark,
-                            color: theme.palette.secondary.light
+                            background: theme.palette.action.hover,
+                            color: theme.palette.primary.main
                         }
                     }}
                     onClick={handleToggle}
                     color='inherit'
                 >
-                    <IconSettings stroke={1.5} size='1.3rem' />
+                    <IconSettings
+                        stroke={1.5}
+                        size='1.3rem'
+                        style={{
+                            color: 'currentColor'
+                        }}
+                    />
                 </Avatar>
             </ButtonBase>
             <Popper
@@ -542,3 +548,4 @@ ProfileSection.propTypes = {
 }
 
 export default ProfileSection
+

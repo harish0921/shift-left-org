@@ -82,13 +82,15 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
                     sx={{
                         '& .MuiDrawer-paper': {
                             width: drawerWidth,
-                            background: theme.palette.background.default,
+                            background: theme.palette.mode === 'light' ? '#FFF7F0' : 'rgba(9,12,18,0.72)',
+                            backdropFilter: theme.palette.mode === 'dark' ? 'blur(18px)' : 'none',
+                            WebkitBackdropFilter: theme.palette.mode === 'dark' ? 'blur(18px)' : 'none',
                             color: theme.palette.text.primary,
                             [theme.breakpoints.up('md')]: {
                                 top: `${headerHeight}px`
                             },
                             borderRight: drawerOpen ? '1px solid' : 'none',
-                            borderColor: drawerOpen ? theme.palette.grey[900] + 25 : 'transparent'
+                            borderColor: drawerOpen ? (theme.palette.mode === 'light' ? '#FFDCC8' : 'rgba(255,255,255,0.08)') : 'transparent'
                         }
                     }}
                     ModalProps={{ keepMounted: true }}
@@ -108,3 +110,4 @@ Sidebar.propTypes = {
 }
 
 export default Sidebar
+

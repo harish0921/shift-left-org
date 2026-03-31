@@ -252,7 +252,7 @@ const Agentflows = () => {
                             variant='contained'
                             onClick={addNew}
                             startIcon={<IconPlus />}
-                            sx={{ borderRadius: 2, height: 40, whiteSpace: 'nowrap', backgroundColor: '#0078D4' }}
+                            sx={{ borderRadius: 2, height: 40, whiteSpace: 'nowrap', backgroundColor: '#FF5C00' }}
                         >
                             Add New
                         </StyledPermissionButton>
@@ -266,8 +266,8 @@ const Agentflows = () => {
                                 alignItems: 'center',
                                 padding: 2,
                                 background: customization.isDarkMode
-                                    ? 'linear-gradient(135deg, rgba(0, 120, 212, 0.28) 0%, rgba(43, 154, 243, 0.35) 100%)'
-                                    : 'linear-gradient(135deg, #e8f4fd 0%, #bbdefb 100%)',
+                                    ? 'linear-gradient(135deg, rgba(255, 92, 0, 0.24) 0%, rgba(255, 122, 51, 0.32) 100%)'
+                                    : 'linear-gradient(135deg, #FFF3EE 0%, #FFB899 100%)',
                                 color: customization.isDarkMode ? 'white' : '#333333',
                                 fontWeight: 400,
                                 borderRadius: 2,
@@ -277,7 +277,7 @@ const Agentflows = () => {
                             <IconAlertTriangle
                                 size={20}
                                 style={{
-                                    color: customization.isDarkMode ? '#90CAF9' : '#0078D4',
+                                    color: customization.isDarkMode ? '#FFB088' : '#FF5C00',
                                     flexShrink: 0
                                 }}
                             />
@@ -290,9 +290,9 @@ const Agentflows = () => {
                                 size='small'
                                 onClick={handleDismissDeprecationNotice}
                                 sx={{
-                                    color: customization.isDarkMode ? '#90CAF9' : '#0078D4',
+                                    color: customization.isDarkMode ? '#FFB088' : '#FF5C00',
                                     '&:hover': {
-                                        backgroundColor: 'rgba(0, 120, 212, 0.12)'
+                                        backgroundColor: 'rgba(255, 92, 0, 0.12)'
                                     }
                                 }}
                             >
@@ -354,3 +354,4 @@ const Agentflows = () => {
 }
 
 export default Agentflows
+

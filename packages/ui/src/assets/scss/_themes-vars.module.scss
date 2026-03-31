@@ -2,17 +2,17 @@
 $paper: #ffffff;
 
 // primary
-$primaryLight: #2b9af3;
-$primaryMain: #0078d4;
-$primaryDark: #005a9e;
-$primary200: #90caf9;
+$primaryLight: #ff7a33;
+$primaryMain: #ff5c00;
+$primaryDark: #e04f00;
+$primary200: #FFB899;
 $primary800: #003a6b;
 
 // secondary
-$secondaryLight: #e8f4fd;
-$secondaryMain: #0078d4;
-$secondaryDark: #005a9e;
-$secondary200: #bbdefb;
+$secondaryLight: #FFF3EE;
+$secondaryMain: #ff5c00;
+$secondaryDark: #e04f00;
+$secondary200: #FFB899;
 $secondary800: #003a6b;
 
 // success Colors
@@ -27,9 +27,9 @@ $errorMain: #f44336;
 $errorDark: #c62828;
 
 // orange
-$orangeLight: #0078d4;
-$orangeMain: #0078d4;
-$orangeDark: #0078d4;
+$orangeLight: #ff7a33;
+$orangeMain: #ff5c00;
+$orangeDark: #e04f00;
 
 // brown
 $tealLight: #76c893;
@@ -58,31 +58,31 @@ $transparent: #ffffff00;
 // ==============================|| DARK THEME VARIANTS ||============================== //
 
 // paper & background
-$darkBackground: #191b1f;
-$darkPaper: #191b1f;
+$darkBackground: #ffffff;
+$darkPaper: #ffffff;
 
 // dark 800 & 900
-$darkLevel1: #252525; // level 1
-$darkLevel2: #242424; // level 2
+$darkLevel1: #f7f7f5; // level 1
+$darkLevel2: #f0f0ed; // level 2
 
 // primary dark
-$darkPrimaryLight: #23262c;
-$darkPrimaryMain: #23262c;
-$darkPrimaryDark: #191b1f;
-$darkPrimary200: #c9d4e9;
-$darkPrimary800: #32353b;
+$darkPrimaryLight: #fff3ee;
+$darkPrimaryMain: #ff5c00;
+$darkPrimaryDark: #e04f00;
+$darkPrimary200: #ffb899;
+$darkPrimary800: #cc4a00;
 
 // secondary dark
-$darkSecondaryLight: #454c59;
-$darkSecondaryMain: #7c4dff;
-$darkSecondaryDark: #ffffff;
-$darkSecondary200: #32353b;
-$darkSecondary800: #6200ea;
+$darkSecondaryLight: #f0f0ed;
+$darkSecondaryMain: #1a1a1a;
+$darkSecondaryDark: #000000;
+$darkSecondary200: #6b6b6b;
+$darkSecondary800: #0a0a0a;
 
 // text variants
-$darkTextTitle: #d7dcec;
-$darkTextPrimary: #bdc8f0;
-$darkTextSecondary: #8492c4;
+$darkTextTitle: #1a1a1a;
+$darkTextPrimary: #1a1a1a;
+$darkTextSecondary: #6b6b6b;
 
 // ==============================|| JAVASCRIPT ||============================== //
 

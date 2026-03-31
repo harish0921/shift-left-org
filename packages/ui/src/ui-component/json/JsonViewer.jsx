@@ -7,11 +7,11 @@ const JsonToken = ({ type, children, isDarkMode }) => {
     const getTokenStyle = (tokenType) => {
         switch (tokenType) {
             case 'string':
-                return { color: isDarkMode ? '#9cdcfe' : 'green' }
+                return { color: isDarkMode ? '#FFB088' : '#E5520F' }
             case 'number':
-                return { color: isDarkMode ? '#b5cea8' : '#0078D4' }
+                return { color: isDarkMode ? '#b5cea8' : '#FF6B2C' }
             case 'boolean':
-                return { color: isDarkMode ? '#569cd6' : 'blue' }
+                return { color: isDarkMode ? '#FF8F5E' : '#FF6B2C' }
             case 'null':
                 return { color: isDarkMode ? '#d4d4d4' : 'magenta' }
             case 'key':
@@ -108,7 +108,7 @@ export const JSONViewer = ({ data, maxHeight = '400px' }) => {
             <pre
                 style={{
                     margin: 0,
-                    fontFamily: `'Inter', 'Roboto', 'Arial', sans-serif`,
+                    fontFamily: `'JetBrains Mono', 'Courier New', monospace`,
                     fontSize: '0.875rem',
                     whiteSpace: 'pre-wrap',
                     wordBreak: 'break-word'
@@ -130,3 +130,5 @@ JsonToken.propTypes = {
     children: PropTypes.node.isRequired,
     isDarkMode: PropTypes.bool.isRequired
 }
+
+

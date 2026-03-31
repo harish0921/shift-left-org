@@ -587,7 +587,7 @@ const VectorStoreConfigure = () => {
                                                     minHeight: '200px',
                                                     boxShadow: '0 2px 14px 0 rgb(32 40 45 / 20%)',
                                                     backgroundImage: customization?.isDarkMode
-                                                        ? `linear-gradient(to right, #0078D4, #0078D4)`
+                                                        ? `linear-gradient(to right, #FF6B2C, #FF6B2C)`
                                                         : `linear-gradient(to right, #fadef2, #cfdcf1)`,
                                                     '&:hover': {
                                                         backgroundImage: customization?.isDarkMode
@@ -999,3 +999,4 @@ const VectorStoreConfigure = () => {
 }
 
 export default VectorStoreConfigure
+

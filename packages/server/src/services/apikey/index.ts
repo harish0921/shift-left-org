@@ -1,8 +1,6 @@
 import { StatusCodes } from 'http-status-codes'
 import { v4 as uuidv4 } from 'uuid'
 import { ApiKey } from '../../database/entities/ApiKey'
-import { ChatFlow } from '../../database/entities/ChatFlow'
-import { Workspace } from '../../database/entities/Workspace'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getErrorMessage } from '../../errors/utils'
 import { Platform } from '../../Interface'
@@ -117,9 +115,6 @@ const getAllApiKeys = async (user: LoggedInUser | undefined, page: number = -1, 
             queryBuilder.skip((page - 1) * limit)
             queryBuilder.take(limit)
         }
-        if (user?.activeWorkspaceId) {
-            queryBuilder.andWhere('api_key.workspaceId = :workspaceId', { workspaceId: user.activeWorkspaceId })
-        }
         const allKeys = await queryBuilder.getMany()
 
         // Filter keys based on user permissions
@@ -174,10 +169,7 @@ const getApiKeyById = async (apiKeyId: string) => {
     }
 }
 
-const createApiKey = async (user: LoggedInUser | undefined, keyName: string, permissions: string[]) => {
-    // Validate permissions before creating the key
-    validatePermissions(user, permissions, 'create')
-
+const createApiKey = async (keyName: string) => {
     const apiKey = generateAPIKey()
     const apiSecret = generateSecretHash(apiKey)
     const appServer = getRunningExpressApp()
@@ -186,34 +178,10 @@ const createApiKey = async (user: LoggedInUser | undefined, keyName: string, per
     newKey.apiKey = apiKey
     newKey.apiSecret = apiSecret
     newKey.keyName = keyName
-    newKey.permissions = permissions
-    let workspaceId = user?.activeWorkspaceId
-    if (!workspaceId) {
-        const latestFlow = await appServer.AppDataSource.getRepository(ChatFlow)
-            .createQueryBuilder('chat_flow')
-            .select('chat_flow.workspaceId', 'workspaceId')
-            .where('chat_flow.workspaceId IS NOT NULL')
-            .andWhere("chat_flow.workspaceId <> ''")
-            .orderBy('chat_flow.updatedDate', 'DESC')
-            .getRawOne()
-        workspaceId = latestFlow?.workspaceId
-    }
-    if (!workspaceId) {
-        const latestWorkspace = await appServer.AppDataSource.getRepository(Workspace)
-            .createQueryBuilder('workspace')
-            .select('workspace.id', 'id')
-            .orderBy('workspace.updatedDate', 'DESC')
-            .getRawOne()
-        workspaceId = latestWorkspace?.id
-    }
-    if (!workspaceId) {
-        throw new InternalFlowiseError(StatusCodes.PRECONDITION_FAILED, 'Workspace ID is required')
-    }
-    newKey.workspaceId = workspaceId
+    newKey.permissions = []
     const key = appServer.AppDataSource.getRepository(ApiKey).create(newKey)
     await appServer.AppDataSource.getRepository(ApiKey).save(key)
-    const responseUser = user || ({ activeWorkspaceId: workspaceId, isOrganizationAdmin: true, permissions: [] } as LoggedInUser)
-    return await getAllApiKeys(responseUser)
+    return await getAllApiKeys(undefined)
 }
 
 // Update api key
@@ -235,10 +203,10 @@ const updateApiKey = async (user: LoggedInUser, id: string, keyName: string, per
     return await getAllApiKeys(user)
 }
 
-const deleteApiKey = async (id: string, workspaceId: string) => {
+const deleteApiKey = async (id: string) => {
     try {
         const appServer = getRunningExpressApp()
-        const dbResponse = await appServer.AppDataSource.getRepository(ApiKey).delete({ id, workspaceId })
+        const dbResponse = await appServer.AppDataSource.getRepository(ApiKey).delete({ id })
         if (!dbResponse) {
             throw new InternalFlowiseError(StatusCodes.NOT_FOUND, `ApiKey ${id} not found`)
         }

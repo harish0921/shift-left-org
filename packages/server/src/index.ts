@@ -354,7 +354,9 @@ export function getInstance(): App | undefined {
     return serverApp
 }
 
-if (require.main === module) {
+const shouldStartDirectly = require.main === module || /[\\/]dist[\\/]index\.js$/i.test(process.argv[1] || '')
+
+if (shouldStartDirectly) {
     start().catch((error) => {
         logger.error('[server]: Failed to start server', error)
         process.exit(1)

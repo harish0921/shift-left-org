@@ -132,7 +132,7 @@ const DocStoreInputHandler = ({ inputParam, data, disabled = false, onNodeDataCh
                                     marginBottom: 10
                                 }}
                             >
-                                <IconAlertTriangle size={30} color='#0078D4' />
+                                <IconAlertTriangle size={30} color='#FF6B2C' />
                                 <span style={{ color: 'rgb(116,66,16)', marginLeft: 10 }}>{inputParam.warning}</span>
                             </div>
                         )}
@@ -320,3 +320,4 @@ DocStoreInputHandler.propTypes = {
 }
 
 export default DocStoreInputHandler
+

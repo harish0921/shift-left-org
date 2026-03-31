@@ -5,7 +5,7 @@ import { blue } from './tabColors'
 
 export const Tab = styled(BaseTab)(
     ({ ...props }) => `
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
   color: white;
   cursor: pointer;
   font-size: 0.75rem;
@@ -40,3 +40,4 @@ export const Tab = styled(BaseTab)(
   }
  `
 )
+

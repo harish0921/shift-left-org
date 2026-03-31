@@ -15,15 +15,15 @@ const DocumentStoreStatus = ({ status, isTableView }) => {
             case 'EMPTY':
                 return customization.isDarkMode
                     ? ['#4a148c', '#6a1b9a', '#ffffff'] // Deep Purple
-                    : ['#d1c4e9', '#9575cd', '#673ab7']
+                    : ['#d1c4e9', '#9575cd', '#E04F00']
             case 'SYNCING':
                 return customization.isDarkMode
                     ? ['#ff6f00', '#ff8f00', '#ffffff'] // Amber
                     : ['#fff8e1', '#ffe57f', '#ffc107']
             case 'UPSERTING':
                 return customization.isDarkMode
-                    ? ['#01579b', '#0277bd', '#ffffff'] // Light Blue
-                    : ['#e1f5fe', '#4fc3f7', '#0288d1']
+                    ? ['#CC4A00', '#E04F00', '#ffffff'] // Orange
+                    : ['#FFF3EE', '#FFB899', '#FF5C00']
             case 'SYNC':
                 return customization.isDarkMode
                     ? ['#1b5e20', '#2e7d32', '#ffffff'] // Green
@@ -34,8 +34,8 @@ const DocumentStoreStatus = ({ status, isTableView }) => {
                     : ['#e0f2f1', '#4db6ac', '#00897b']
             case 'NEW':
                 return customization.isDarkMode
-                    ? ['#0d47a1', '#1565c0', '#ffffff'] // Blue
-                    : ['#e3f2fd', '#64b5f6', '#1e88e5']
+                    ? ['#CC4A00', '#E04F00', '#ffffff'] // Blue
+                    : ['#FFF3EE', '#FFB899', '#FF7A33']
             default:
                 return customization.isDarkMode
                     ? [theme.palette.grey[300], theme.palette.grey[500], theme.palette.grey[700]]

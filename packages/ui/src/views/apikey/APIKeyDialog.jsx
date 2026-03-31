@@ -28,8 +28,6 @@ import { IconCopy, IconKey, IconX } from '@tabler/icons-react'
 import apikeyApi from '@/api/apikey'
 import authApi from '@/api/auth'
 
-// Hooks
-import useApi from '@/hooks/useApi'
 import { useConfig } from '@/store/context/ConfigContext'
 import { useSelector } from 'react-redux'
 
@@ -42,6 +40,55 @@ import { HIDE_CANVAS_DIALOG, SHOW_CANVAS_DIALOG } from '@/store/actions'
 import './APIKeyDialog.css'
 
 const EMPTY_PERMISSIONS = []
+const FALLBACK_API_KEY_PERMISSIONS = ['chatflows:view', 'assistants:view', 'tools:view']
+
+const readPermissionsFromLocalStorage = () => {
+    try {
+        const rawPermissions = localStorage.getItem('permissions')
+        if (rawPermissions && rawPermissions !== 'undefined') {
+            return JSON.parse(rawPermissions)
+        }
+    } catch (e) {
+        console.error(e)
+    }
+    try {
+        const rawUser = localStorage.getItem('user')
+        if (rawUser && rawUser !== 'undefined') {
+            const user = JSON.parse(rawUser)
+            return user?.permissions ?? []
+        }
+    } catch (e) {
+        console.error(e)
+    }
+    return []
+}
+
+const extractPermissionKeys = (input, collector = []) => {
+    if (!input) return collector
+
+    if (typeof input === 'string') {
+        collector.push(input)
+        return collector
+    }
+
+    if (Array.isArray(input)) {
+        input.forEach((item) => extractPermissionKeys(item, collector))
+        return collector
+    }
+
+    if (typeof input === 'object') {
+        const knownFields = [input.key, input.permission, input.name, input.value].filter((v) => typeof v === 'string')
+        knownFields.forEach((value) => collector.push(value))
+
+        Object.entries(input).forEach(([key, value]) => {
+            if (value === true && key.includes(':')) collector.push(key)
+            if (typeof value === 'string' && value.includes(':')) collector.push(value)
+            if (typeof value === 'object' && value !== null) extractPermissionKeys(value, collector)
+        })
+    }
+
+    return collector
+}
 
 const APIKeyDialog = ({ show, dialogProps, onCancel, onConfirm, setError }) => {
     const portalElement = document.getElementById('portal')
@@ -62,14 +109,15 @@ const APIKeyDialog = ({ show, dialogProps, onCancel, onConfirm, setError }) => {
     const openPopOver = Boolean(anchorEl)
     const [selectedPermissions, setSelectedPermissions] = useState({})
     const [permissions, setPermissions] = useState({})
-    const currentUserPermissions = useSelector((state) => state.auth.permissions) ?? EMPTY_PERMISSIONS
-
-    const getAllPermissionsApi = useApi(authApi.getAllPermissions)
-    const hasPermissionsError = Boolean(getAllPermissionsApi.error)
+    const currentUserPermissions = useSelector((state) => state.auth.permissions ?? state.auth.user?.permissions) ?? EMPTY_PERMISSIONS
+    const [permissionsApiData, setPermissionsApiData] = useState(null)
+    const [permissionsApiError, setPermissionsApiError] = useState(null)
+    const hasPermissionsError = Boolean(permissionsApiError)
 
     const buildFallbackPermissions = (permissionKeys = []) => {
+        const normalizedPermissions = [...new Set(extractPermissionKeys(permissionKeys, []))]
         const grouped = {}
-        permissionKeys
+        normalizedPermissions
             .filter((perm) => typeof perm === 'string')
             .filter((perm) => !perm.startsWith('workspace:') && !perm.startsWith('admin:'))
             .forEach((perm) => {
@@ -77,20 +125,40 @@ const APIKeyDialog = ({ show, dialogProps, onCancel, onConfirm, setError }) => {
                 if (!grouped[category]) grouped[category] = []
                 grouped[category].push({
                     key: perm,
-                    label: perm
+                    label: perm,
+                    value: perm
                 })
             })
+        if (!Object.keys(grouped).length) {
+            grouped.general = FALLBACK_API_KEY_PERMISSIONS.map((permission) => ({
+                key: permission,
+                label: permission,
+                value: permission
+            }))
+        }
         return grouped
     }
 
     useEffect(() => {
         if (!show) return
+        const fetchAllPermissions = async () => {
+            try {
+                const response = await authApi.getAllPermissions('API_KEY')
+                setPermissionsApiData(response.data)
+                setPermissionsApiError(null)
+            } catch (error) {
+                // Do not escalate to global error boundary.
+                // OSS mode can return 404 for this endpoint.
+                setPermissionsApiData(null)
+                setPermissionsApiError(error)
+            }
+        }
         if (dialogProps.type === 'EDIT' && dialogProps.key) {
             setKeyName(dialogProps.key.keyName)
         } else if (dialogProps.type === 'ADD') {
             setKeyName('')
         }
-        getAllPermissionsApi.request('API_KEY')
+        fetchAllPermissions()
         return () => {
             setSelectedPermissions({})
         }
@@ -101,7 +169,10 @@ const APIKeyDialog = ({ show, dialogProps, onCancel, onConfirm, setError }) => {
         if (hasPermissionsError) {
             // OSS mode may not expose /auth/permissions endpoints.
             // Fall back to currently available user permissions instead of blocking the whole page.
-            const fallbackPermissions = buildFallbackPermissions(currentUserPermissions)
+            const fallbackPermissions = buildFallbackPermissions([
+                ...extractPermissionKeys(currentUserPermissions, []),
+                ...extractPermissionKeys(readPermissionsFromLocalStorage(), [])
+            ])
             setPermissions((prevPermissions) =>
                 JSON.stringify(prevPermissions) === JSON.stringify(fallbackPermissions) ? prevPermissions : fallbackPermissions
             )
@@ -116,8 +187,8 @@ const APIKeyDialog = ({ show, dialogProps, onCancel, onConfirm, setError }) => {
     }, [show, dispatch])
 
     useEffect(() => {
-        if (getAllPermissionsApi.data) {
-            const permissionsData = getAllPermissionsApi.data
+        if (permissionsApiData) {
+            const permissionsData = JSON.parse(JSON.stringify(permissionsApiData))
 
             // Filter permissions based on current platform
             Object.keys(permissionsData).forEach((category) => {
@@ -159,7 +230,7 @@ const APIKeyDialog = ({ show, dialogProps, onCancel, onConfirm, setError }) => {
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [getAllPermissionsApi.data])
+    }, [permissionsApiData])
 
     const handleClosePopOver = () => {
         setAnchorEl(null)

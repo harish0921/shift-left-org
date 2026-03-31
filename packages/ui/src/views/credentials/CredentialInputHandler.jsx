@@ -78,7 +78,7 @@ const CredentialInputHandler = ({ inputParam, data, disabled = false }) => {
                                     marginBottom: 10
                                 }}
                             >
-                                <IconAlertTriangle size={36} color='#0078D4' />
+                                <IconAlertTriangle size={36} color='#FF6B2C' />
                                 <span style={{ color: 'rgb(116,66,16)', marginLeft: 10 }}>{inputParam.warning}</span>
                             </div>
                         )}
@@ -135,3 +135,4 @@ CredentialInputHandler.propTypes = {
 }
 
 export default CredentialInputHandler
+

@@ -308,20 +308,20 @@ const EvalsEvaluation = () => {
                                     borderRadius: 2,
                                     height: '100%',
                                     backgroundColor: 'transparent',
-                                    color: autoRefresh ? '#0078D4' : '#0078D4',
+                                    color: autoRefresh ? '#FF6B2C' : '#FF6B2C',
                                     border: '1px solid transparent',
                                     '&:hover': {
                                         backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                                        color: autoRefresh ? '#005A9E' : '#005A9E',
+                                        color: autoRefresh ? '#E5520F' : '#E5520F',
                                         border: '1px solid transparent'
                                     },
                                     '&.Mui-selected': {
                                         backgroundColor: 'transparent',
-                                        color: '#0078D4',
+                                        color: '#FF6B2C',
                                         border: '1px solid transparent',
                                         '&:hover': {
                                             backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                                            color: '#005A9E',
+                                            color: '#E5520F',
                                             border: '1px solid transparent'
                                         }
                                     }
@@ -614,7 +614,7 @@ function EvaluationRunRow(props) {
         if (passPcnt > 90) {
             return '#52b69a'
         } else if (passPcnt >= 50) {
-            return '#0078D4'
+            return '#FF6B2C'
         } else {
             return '#f44336'
         }
@@ -893,3 +893,4 @@ EvaluationRunRow.propTypes = {
     handleSelect: PropTypes.func
 }
 export default EvalsEvaluation
+

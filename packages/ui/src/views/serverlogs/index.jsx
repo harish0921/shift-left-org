@@ -111,7 +111,7 @@ const Logs = () => {
             color: 'rgba(120, 120, 120, 0.5)'
         },
         '.cm-content': {
-            fontFamily: 'Roboto, sans-serif',
+            fontFamily: "'JetBrains Mono', 'Courier New', monospace",
             fontSize: '0.95rem',
             letterSpacing: '0em',
             fontWeight: 400,
@@ -313,3 +313,4 @@ const Logs = () => {
 }
 
 export default Logs
+

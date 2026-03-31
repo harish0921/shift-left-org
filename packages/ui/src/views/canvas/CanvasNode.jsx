@@ -96,7 +96,15 @@ const CanvasNode = ({ data }) => {
                 content={false}
                 sx={{
                     padding: 0,
-                    borderColor: getBorderColor()
+                    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(30,30,30,0.92)' : '#FFFFFF',
+                    border: theme.palette.mode === 'dark' ? '1px solid rgba(255,255,255,0.12)' : '1px solid #E8E8E4',
+                    borderRadius: '12px',
+                    boxShadow: theme.palette.mode === 'dark' ? '0 10px 24px rgba(0,0,0,0.38)' : '0 2px 8px rgba(0,0,0,0.06)',
+                    backdropFilter: theme.palette.mode === 'dark' ? 'blur(10px)' : 'none',
+                    '&:hover': {
+                        border: '1px solid #FF5C00',
+                        boxShadow: '0 4px 16px rgba(255,92,0,0.12)'
+                    }
                 }}
                 border={false}
             >
@@ -156,7 +164,7 @@ const CanvasNode = ({ data }) => {
                                         ...theme.typography.commonAvatar,
                                         ...theme.typography.largeAvatar,
                                         borderRadius: '50%',
-                                        backgroundColor: 'white',
+                                        backgroundColor: theme.palette.mode === 'dark' ? 'rgba(32,32,32,0.95)' : 'rgba(255,255,255,0.95)',
                                         cursor: 'grab',
                                         width: '40px',
                                         height: '40px'
@@ -201,7 +209,7 @@ const CanvasNode = ({ data }) => {
                                 <>
                                     <Tooltip title={<span style={{ whiteSpace: 'pre-line' }}>{warningMessage}</span>} placement='top'>
                                         <IconButton sx={{ height: 35, width: 35 }}>
-                                            <IconAlertTriangle size={35} color='#0078D4' />
+                                            <IconAlertTriangle size={35} color='#FF5C00' />
                                         </IconButton>
                                     </Tooltip>
                                 </>
@@ -295,3 +303,4 @@ CanvasNode.propTypes = {
 }
 
 export default memo(CanvasNode)
+
