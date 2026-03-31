@@ -41,7 +41,7 @@ export enum ChatMessageRatingType {
 export enum Platform {
     OPEN_SOURCE = 'open source',
     CLOUD = 'cloud',
-    ENTERPRISE = 'ee'
+    ENTERPRISE = 'enterprise'
 }
 
 export enum UserPlan {

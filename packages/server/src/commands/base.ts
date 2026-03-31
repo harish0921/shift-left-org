@@ -135,6 +135,7 @@ export abstract class BaseCommand extends Command {
 
         // Enterprise
         LICENSE_URL: Flags.string(),
+        FLOWISE_EE_LICENSE_KEY: Flags.string(),
         OFFLINE: Flags.string(),
 
         // Metrics

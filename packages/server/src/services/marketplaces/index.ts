@@ -4,6 +4,8 @@ import path from 'path'
 import { DeleteResult } from 'typeorm'
 import { v4 as uuidv4 } from 'uuid'
 import { CustomTemplate } from '../../database/entities/CustomTemplate'
+import { WorkspaceService } from '../../enterprise/services/workspace.service'
+import { getWorkspaceSearchOptions } from '../../enterprise/utils/ControllerServiceUtils'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getErrorMessage } from '../../errors/utils'
 import { IReactFlowEdge, IReactFlowNode } from '../../Interface'
@@ -21,30 +23,6 @@ type ITemplate = {
 
 const getCategories = (fileDataObj: ITemplate) => {
     return Array.from(new Set(fileDataObj?.nodes?.map((node) => node.data.category).filter((category) => category)))
-}
-
-const getWorkspaceSearchOptionsSafe = (workspaceId?: string) => {
-    if (typeof getWorkspaceSearchOptions === 'function') {
-        return getWorkspaceSearchOptions(workspaceId)
-    }
-    return workspaceId ? ({ workspaceId } as any) : ({} as any)
-}
-
-const getSharedTemplatesForWorkspaceSafe = async (workspaceId?: string): Promise<CustomTemplate[]> => {
-    if (!workspaceId || typeof WorkspaceService !== 'function') {
-        return []
-    }
-    try {
-        const workspaceService = new WorkspaceService()
-        const sharedItems = (await workspaceService.getSharedItemsForWorkspace(workspaceId, 'custom_template')) as CustomTemplate[]
-        return sharedItems || []
-    } catch (error) {
-        const msg = getErrorMessage(error)
-        if (msg.includes('no such column') && msg.includes('workspaceId')) {
-            return []
-        }
-        throw error
-    }
 }
 
 // Get all templates for marketplaces
@@ -197,9 +175,25 @@ const _modifyTemplates = (templates: any[]) => {
 const getAllCustomTemplates = async (workspaceId?: string): Promise<any> => {
     try {
         const appServer = getRunningExpressApp()
-        const templates: any[] = await appServer.AppDataSource.getRepository(CustomTemplate).find()
+        const templates: any[] = await appServer.AppDataSource.getRepository(CustomTemplate).findBy(getWorkspaceSearchOptions(workspaceId))
+        const dbResponse = []
         _modifyTemplates(templates)
-        return templates
+        dbResponse.push(...templates)
+        // get shared credentials
+        if (workspaceId) {
+            const workspaceService = new WorkspaceService()
+            const sharedItems = (await workspaceService.getSharedItemsForWorkspace(workspaceId, 'custom_template')) as CustomTemplate[]
+            if (sharedItems && sharedItems.length) {
+                _modifyTemplates(sharedItems)
+                // add shared = true flag to all shared items, to differentiate them in the UI
+                sharedItems.forEach((sharedItem) => {
+                    // @ts-ignore
+                    sharedItem.shared = true
+                    dbResponse.push(sharedItem)
+                })
+            }
+        }
+        return dbResponse
     } catch (error) {
         throw new InternalFlowiseError(
             StatusCodes.INTERNAL_SERVER_ERROR,

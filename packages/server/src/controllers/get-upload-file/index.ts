@@ -6,6 +6,8 @@ import { StatusCodes } from 'http-status-codes'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
 import { ChatFlow } from '../../database/entities/ChatFlow'
+import { Workspace } from '../../enterprise/database/entities/workspace.entity'
+
 const streamUploadedFile = async (req: Request, res: Response, next: NextFunction) => {
     try {
         if (!req.query.chatflowId || !req.query.chatId || !req.query.fileName) {

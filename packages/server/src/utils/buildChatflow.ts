@@ -67,8 +67,12 @@ import { checkPredictions, checkStorage, updatePredictionsUsage, updateStorageUs
 import { buildAgentGraph } from './buildAgentGraph'
 import { getErrorMessage } from '../errors/utils'
 import { FLOWISE_METRIC_COUNTERS, FLOWISE_COUNTER_STATUS, IMetricsProvider } from '../Interface.Metrics'
+import { getWorkspaceSearchOptions } from '../enterprise/utils/ControllerServiceUtils'
 import { OMIT_QUEUE_JOB_DATA } from './constants'
 import { executeAgentFlow } from './buildAgentflow'
+import { Workspace } from '../enterprise/database/entities/workspace.entity'
+import { Organization } from '../enterprise/database/entities/organization.entity'
+
 const shouldAutoPlayTTS = (textToSpeechConfig: string | undefined | null): boolean => {
     if (!textToSpeechConfig) return false
     try {
@@ -1028,36 +1032,29 @@ export const utilBuildChatflow = async (req: Request, isInternal: boolean = fals
             }
         }
 
-        // Prefer authenticated context; fall back safely for OSS builds where enterprise globals may be unavailable.
-        let workspaceId = req.user?.activeWorkspaceId || chatflow.workspaceId || ''
-        let orgId = req.user?.activeOrganizationId || ''
-        let subscriptionId = req.user?.activeOrganizationSubscriptionId || ''
+        // This can be public API, so we can only get orgId from the chatflow
+        const chatflowWorkspaceId = chatflow.workspaceId
+        const workspace = await appServer.AppDataSource.getRepository(Workspace).findOneBy({
+            id: chatflowWorkspaceId
+        })
+        if (!workspace) {
+            throw new InternalFlowiseError(StatusCodes.NOT_FOUND, `Workspace ${chatflowWorkspaceId} not found`)
+        }
+        const workspaceId = workspace.id
 
-        if ((!orgId || !subscriptionId) && typeof Workspace !== 'undefined' && typeof Organization !== 'undefined') {
-            const chatflowWorkspaceId = chatflow.workspaceId
-            const workspace = await appServer.AppDataSource.getRepository(Workspace).findOneBy({
-                id: chatflowWorkspaceId
-            })
-            if (workspace) {
-                workspaceId = workspace.id
-                const org = await appServer.AppDataSource.getRepository(Organization).findOneBy({
-                    id: workspace.organizationId
-                })
-                if (org) {
-                    orgId = org.id
-                    subscriptionId = (org.subscriptionId as string) || ''
-                }
-            }
+        const org = await appServer.AppDataSource.getRepository(Organization).findOneBy({
+            id: workspace.organizationId
+        })
+        if (!org) {
+            throw new InternalFlowiseError(StatusCodes.NOT_FOUND, `Organization ${workspace.organizationId} not found`)
         }
 
-        if (!orgId) orgId = 'unknown'
-        if (!workspaceId) workspaceId = ''
+        const orgId = org.id
         organizationId = orgId
-        const productId = subscriptionId ? await appServer.identityManager.getProductIdFromSubscription(subscriptionId) : ''
+        const subscriptionId = org.subscriptionId as string
+        const productId = await appServer.identityManager.getProductIdFromSubscription(subscriptionId)
 
-        if (subscriptionId) {
-            await checkPredictions(orgId, subscriptionId, appServer.usageCacheManager)
-        }
+        await checkPredictions(orgId, subscriptionId, appServer.usageCacheManager)
 
         const executeData: IExecuteFlowParams = {
             incomingInput, // Use the defensively created incomingInput variable

@@ -20,7 +20,7 @@ import { Tool } from '@langchain/core/tools'
 import { ARTIFACTS_PREFIX, SOURCE_DOCUMENTS_PREFIX, TOOL_ARGS_PREFIX } from '../../../src/agents'
 import { flatten } from 'lodash'
 import zodToJsonSchema from 'zod-to-json-schema'
-import { getErrorMessage } from '../../../src/error'
+import { getActionableLLMErrorMessage, getErrorMessage } from '../../../src/error'
 import { DataSource } from 'typeorm'
 import { randomBytes } from 'crypto'
 import {
@@ -1541,14 +1541,16 @@ class Agent_Agentflow implements INode {
                 ]
             }
         } catch (error) {
+            const actionableMessage = getActionableLLMErrorMessage(error)
+
             if (options.analyticHandlers && llmIds) {
-                await options.analyticHandlers.onLLMError(llmIds, error instanceof Error ? error.message : String(error))
+                await options.analyticHandlers.onLLMError(llmIds, actionableMessage)
             }
 
             if (error instanceof Error && error.message === 'Aborted') {
                 throw error
             }
-            throw new Error(`Error in Agent node: ${error instanceof Error ? error.message : String(error)}`)
+            throw new Error(`Error in Agent node: ${actionableMessage}`)
         }
     }
 
