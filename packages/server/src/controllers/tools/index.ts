@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express'
+﻿import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import toolsService from '../../services/tools'
@@ -18,7 +18,7 @@ const createTool = async (req: Request, res: Response, next: NextFunction) => {
             throw new InternalFlowiseError(StatusCodes.NOT_FOUND, `Error: toolsController.createTool - workspace ${workspaceId} not found!`)
         }
         const body = req.body
-        // Explicit allowlist — id/workspaceId/timestamps must not be overrideable by client
+        // Explicit allowlist â€” id/workspaceId/timestamps must not be overrideable by client
         const toolBody: Record<string, unknown> = {}
         if (body.name !== undefined) toolBody.name = body.name
         if (body.description !== undefined) toolBody.description = body.description
@@ -40,11 +40,8 @@ const deleteTool = async (req: Request, res: Response, next: NextFunction) => {
         if (typeof req.params === 'undefined' || !req.params.id) {
             throw new InternalFlowiseError(StatusCodes.PRECONDITION_FAILED, `Error: toolsController.deleteTool - id not provided!`)
         }
-        const workspaceId = req.user?.activeWorkspaceId
-        if (!workspaceId) {
-            throw new InternalFlowiseError(StatusCodes.NOT_FOUND, `Error: toolsController.deleteTool - workspace ${workspaceId} not found!`)
-        }
-        const apiResponse = await toolsService.deleteTool(req.params.id, workspaceId)
+        const workspaceId = req.user?.activeWorkspaceId || ''
+const apiResponse = await toolsService.deleteTool(req.params.id, workspaceId)
         return res.json(apiResponse)
     } catch (error) {
         next(error)
@@ -66,14 +63,8 @@ const getToolById = async (req: Request, res: Response, next: NextFunction) => {
         if (typeof req.params === 'undefined' || !req.params.id) {
             throw new InternalFlowiseError(StatusCodes.PRECONDITION_FAILED, `Error: toolsController.getToolById - id not provided!`)
         }
-        const workspaceId = req.user?.activeWorkspaceId
-        if (!workspaceId) {
-            throw new InternalFlowiseError(
-                StatusCodes.NOT_FOUND,
-                `Error: toolsController.getToolById - workspace ${workspaceId} not found!`
-            )
-        }
-        const apiResponse = await toolsService.getToolById(req.params.id, workspaceId)
+        const workspaceId = req.user?.activeWorkspaceId || ''
+const apiResponse = await toolsService.getToolById(req.params.id, workspaceId)
         return res.json(apiResponse)
     } catch (error) {
         next(error)
@@ -93,7 +84,7 @@ const updateTool = async (req: Request, res: Response, next: NextFunction) => {
             throw new InternalFlowiseError(StatusCodes.NOT_FOUND, `Error: toolsController.updateTool - workspace ${workspaceId} not found!`)
         }
         const body = req.body
-        // Explicit allowlist — id/workspaceId/timestamps must not be overrideable by client
+        // Explicit allowlist â€” id/workspaceId/timestamps must not be overrideable by client
         const toolBody: Record<string, unknown> = {}
         if (body.name !== undefined) toolBody.name = body.name
         if (body.description !== undefined) toolBody.description = body.description

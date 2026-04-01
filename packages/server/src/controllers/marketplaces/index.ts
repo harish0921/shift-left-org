@@ -21,14 +21,8 @@ const deleteCustomTemplate = async (req: Request, res: Response, next: NextFunct
                 `Error: marketplacesService.deleteCustomTemplate - id not provided!`
             )
         }
-        const workspaceId = req.user?.activeWorkspaceId
-        if (!workspaceId) {
-            throw new InternalFlowiseError(
-                StatusCodes.NOT_FOUND,
-                `Error: marketplacesController.deleteCustomTemplate - workspace ${workspaceId} not found!`
-            )
-        }
-        const apiResponse = await marketplacesService.deleteCustomTemplate(req.params.id, workspaceId)
+        const workspaceId = req.user?.activeWorkspaceId || ''
+const apiResponse = await marketplacesService.deleteCustomTemplate(req.params.id, workspaceId)
         return res.json(apiResponse)
     } catch (error) {
         next(error)

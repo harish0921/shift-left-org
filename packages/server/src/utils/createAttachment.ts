@@ -17,8 +17,6 @@ import logger from './logger'
 import { getErrorMessage } from '../errors/utils'
 import { checkStorage, updateStorageUsage } from './quotaUsage'
 import { ChatFlow } from '../database/entities/ChatFlow'
-import { Workspace } from '../enterprise/database/entities/workspace.entity'
-import { Organization } from '../enterprise/database/entities/organization.entity'
 import { InternalFlowiseError } from '../errors/internalFlowiseError'
 import { StatusCodes } from 'http-status-codes'
 

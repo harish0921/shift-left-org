@@ -11,14 +11,8 @@ const getSingleFlowConfig = async (req: Request, res: Response, next: NextFuncti
                 `Error: flowConfigsController.getSingleFlowConfig - id not provided!`
             )
         }
-        const workspaceId = req.user?.activeWorkspaceId
-        if (!workspaceId) {
-            throw new InternalFlowiseError(
-                StatusCodes.NOT_FOUND,
-                `Error: flowConfigsController.getSingleFlowConfig - workspace ${workspaceId} not found!`
-            )
-        }
-        const apiResponse = await flowConfigsService.getSingleFlowConfig(req.params.id, workspaceId)
+        const workspaceId = req.user?.activeWorkspaceId || ''
+const apiResponse = await flowConfigsService.getSingleFlowConfig(req.params.id, workspaceId)
         return res.json(apiResponse)
     } catch (error) {
         next(error)

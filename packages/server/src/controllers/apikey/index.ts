@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import { LoggedInUser } from '../../enterprise/Interface.Enterprise'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import apikeyService from '../../services/apikey'
 import { getPageAndLimitParams } from '../../utils/pagination'
@@ -10,7 +9,7 @@ const getAllApiKeys = async (req: Request, res: Response, next: NextFunction) =>
     try {
         const user = req.user as LoggedInUser
 
-        if (req.query?.type === 'organization' && user.isOrganizationAdmin)
+        if (req.query?.type === 'organization' && user?.isOrganizationAdmin)
             return res.status(StatusCodes.OK).json(await apikeyService.getAllApiKeysByOrganization(user.activeOrganizationId))
 
         const { page, limit } = getPageAndLimitParams(req)
@@ -26,19 +25,7 @@ const createApiKey = async (req: Request, res: Response, next: NextFunction) => 
         if (typeof req.body === 'undefined' || !req.body.keyName) {
             throw new InternalFlowiseError(StatusCodes.PRECONDITION_FAILED, `Error: apikeyController.createApiKey - keyName not provided!`)
         }
-        if (
-            !req.body.permissions ||
-            !Array.isArray(req.body.permissions) ||
-            req.body.permissions.length === 0 ||
-            !req.body.permissions.every((p: any) => typeof p === 'string')
-        ) {
-            throw new InternalFlowiseError(
-                StatusCodes.PRECONDITION_FAILED,
-                `Error: apikeyController.createApiKey - permissions must be an array of strings!`
-            )
-        }
-        const user = req.user as LoggedInUser
-        const apiResponse = await apikeyService.createApiKey(user, req.body.keyName, req.body.permissions)
+        const apiResponse = await apikeyService.createApiKey(req.body.keyName)
         return res.json(apiResponse)
     } catch (error) {
         next(error)
@@ -79,10 +66,7 @@ const deleteApiKey = async (req: Request, res: Response, next: NextFunction) => 
         if (typeof req.params === 'undefined' || !req.params.id) {
             throw new InternalFlowiseError(StatusCodes.PRECONDITION_FAILED, `Error: apikeyController.deleteApiKey - id not provided!`)
         }
-        if (!req.user?.activeWorkspaceId) {
-            throw new InternalFlowiseError(StatusCodes.PRECONDITION_FAILED, `Workspace ID is required`)
-        }
-        const apiResponse = await apikeyService.deleteApiKey(req.params.id, req.user?.activeWorkspaceId)
+        const apiResponse = await apikeyService.deleteApiKey(req.params.id)
         return res.json(apiResponse)
     } catch (error) {
         next(error)

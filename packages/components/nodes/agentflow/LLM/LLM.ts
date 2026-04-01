@@ -18,7 +18,6 @@ import {
 import { processTemplateVariables, configureStructuredOutput, extractResponseContent } from '../../../src/utils'
 import { getModelConfigByModelName, MODEL_TYPE } from '../../../src/modelLoader'
 import { flatten } from 'lodash'
-import { getActionableLLMErrorMessage } from '../../../src/error'
 
 class LLM_Agentflow implements INode {
     label: string
@@ -685,16 +684,14 @@ class LLM_Agentflow implements INode {
                 ]
             }
         } catch (error) {
-            const actionableMessage = getActionableLLMErrorMessage(error)
-
             if (options.analyticHandlers && llmIds) {
-                await options.analyticHandlers.onLLMError(llmIds, actionableMessage)
+                await options.analyticHandlers.onLLMError(llmIds, error instanceof Error ? error.message : String(error))
             }
 
             if (error instanceof Error && error.message === 'Aborted') {
                 throw error
             }
-            throw new Error(`Error in LLM node: ${actionableMessage}`)
+            throw new Error(`Error in LLM node: ${error instanceof Error ? error.message : String(error)}`)
         }
     }
 

@@ -1,9 +1,6 @@
 import { Args } from '@oclif/core'
 import { QueryRunner } from 'typeorm'
 import * as DataSource from '../DataSource'
-import { User } from '../enterprise/database/entities/user.entity'
-import { getHash } from '../enterprise/utils/encryption.util'
-import { validatePasswordOrThrow } from '../enterprise/utils/validation.util'
 import logger from '../utils/logger'
 import { BaseCommand } from './base'
 
@@ -46,11 +43,11 @@ export default class user extends BaseCommand {
 
     async listUserEmails(queryRunner: QueryRunner) {
         logger.info('Listing all user emails')
-        const users = await queryRunner.manager.find(User, {
+        const users = (await queryRunner.manager.find(User, {
             select: ['email']
-        })
+        })) as any[]
 
-        const emails = users.map((user) => user.email)
+        const emails = users.map((user) => user.email as string)
         logger.info(`Email addresses: ${emails.join(', ')}`)
         logger.info(`Email count: ${emails.length}`)
         logger.info('To reset user password, run the following command: pnpm user --email "myEmail" --password "myPassword"')
@@ -58,9 +55,9 @@ export default class user extends BaseCommand {
 
     async resetPassword(queryRunner: QueryRunner, email: string, password: string) {
         logger.info(`Finding user by email: ${email}`)
-        const user = await queryRunner.manager.findOne(User, {
+        const user = (await queryRunner.manager.findOne(User, {
             where: { email }
-        })
+        })) as any
         if (!user) throw new Error(`User not found with email: ${email}`)
 
         validatePasswordOrThrow(password)

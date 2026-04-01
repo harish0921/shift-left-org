@@ -15,7 +15,9 @@ import OrgWorkspaceBreadcrumbs from '@/layout/MainLayout/Header/OrgWorkspaceBrea
 import PricingDialog from '@/ui-component/subscription/PricingDialog'
 
 // assets
-import { IconMenu2, IconX, IconSparkles, IconMoon, IconSun } from '@tabler/icons-react'
+import { IconMenu2, IconX, IconSparkles } from '@tabler/icons-react'
+import DarkModeIcon from '@mui/icons-material/DarkMode'
+import LightModeIcon from '@mui/icons-material/LightMode'
 
 // store
 import { store } from '@/store'
@@ -178,7 +180,7 @@ const Header = ({ handleLeftDrawerToggle }) => {
                         '&:hover': { color: '#FF5C00', backgroundColor: 'rgba(255,92,0,0.08)' }
                     }}
                 >
-                    {isDark ? <IconSun size={20} /> : <IconMoon size={20} />}
+                    {isDark ? <LightModeIcon sx={{ color: 'inherit' }} /> : <DarkModeIcon sx={{ color: 'inherit' }} />}
                 </IconButton>
             </Tooltip>
             <Box sx={{ ml: 2 }}></Box>

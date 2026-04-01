@@ -9,8 +9,6 @@ import { ChatFlow, EnumChatflowType } from '../../database/entities/ChatFlow'
 import { ChatMessage } from '../../database/entities/ChatMessage'
 import { ChatMessageFeedback } from '../../database/entities/ChatMessageFeedback'
 import { UpsertHistory } from '../../database/entities/UpsertHistory'
-import { Workspace } from '../../enterprise/database/entities/workspace.entity'
-import { getWorkspaceSearchOptions } from '../../enterprise/utils/ControllerServiceUtils'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getErrorMessage } from '../../errors/utils'
 import documentStoreService from '../../services/documentstore'
@@ -31,6 +29,13 @@ export const enum ChatflowErrorMessage {
 export function validateChatflowType(type: ChatflowType | undefined) {
     if (!Object.values(EnumChatflowType).includes(type as EnumChatflowType))
         throw new InternalFlowiseError(StatusCodes.BAD_REQUEST, ChatflowErrorMessage.INVALID_CHATFLOW_TYPE)
+}
+
+const getWorkspaceSearchOptionsSafe = (workspaceId?: string) => {
+    if (typeof getWorkspaceSearchOptions === 'function') {
+        return getWorkspaceSearchOptions(workspaceId)
+    }
+    return workspaceId ? { workspaceId } : {}
 }
 
 // Check if chatflow valid for streaming
@@ -184,6 +189,11 @@ async function getAllChatflowsCountByOrganization(type: ChatflowType, organizati
     try {
         const appServer = getRunningExpressApp()
 
+        // OSS runtime does not define enterprise Workspace globals.
+        if (typeof Workspace === 'undefined') {
+            return await appServer.AppDataSource.getRepository(ChatFlow).countBy({ type })
+        }
+
         const workspaces = await appServer.AppDataSource.getRepository(Workspace).findBy({ organizationId })
         const workspaceIds = workspaces.map((workspace) => workspace.id)
         const chatflowsCount = await appServer.AppDataSource.getRepository(ChatFlow).countBy({
@@ -206,11 +216,11 @@ const getAllChatflowsCount = async (type?: ChatflowType, workspaceId?: string): 
         if (type) {
             const dbResponse = await appServer.AppDataSource.getRepository(ChatFlow).countBy({
                 type,
-                ...getWorkspaceSearchOptions(workspaceId)
+                ...getWorkspaceSearchOptionsSafe(workspaceId)
             })
             return dbResponse
         }
-        const dbResponse = await appServer.AppDataSource.getRepository(ChatFlow).countBy(getWorkspaceSearchOptions(workspaceId))
+        const dbResponse = await appServer.AppDataSource.getRepository(ChatFlow).countBy(getWorkspaceSearchOptionsSafe(workspaceId))
         return dbResponse
     } catch (error) {
         throw new InternalFlowiseError(
