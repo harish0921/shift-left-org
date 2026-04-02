@@ -2,6 +2,13 @@ import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import exportImportService from '../../services/export-import'
+const resolveImportContext = async (req: Request) => {
+    const workspaceId = req.user?.activeWorkspaceId || req.user?.workspaceId || ''
+    let orgId = req.user?.activeOrganizationId || req.user?.organizationId || ''
+    let subscriptionId = req.user?.activeOrganizationSubscriptionId || req.user?.organizationSubscriptionId || ''
+
+    return { workspaceId, orgId, subscriptionId }
+}
 
 const exportData = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -15,15 +22,8 @@ const apiResponse = await exportImportService.exportData(exportImportService.con
 
 const importData = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const orgId = req.user?.activeOrganizationId
-        if (!orgId) {
-            throw new InternalFlowiseError(
-                StatusCodes.NOT_FOUND,
-                `Error: exportImportController.importData - organization ${orgId} not found!`
-            )
-        }
-        const workspaceId = req.user?.activeWorkspaceId || ''
-const subscriptionId = req.user?.activeOrganizationSubscriptionId || ''
+        const { workspaceId, orgId: resolvedOrgId, subscriptionId } = await resolveImportContext(req)
+        const orgId = resolvedOrgId || 'unknown'
 
         const importData = req.body
         if (!importData) {

@@ -69,6 +69,14 @@ import { getErrorMessage } from '../errors/utils'
 import { FLOWISE_METRIC_COUNTERS, FLOWISE_COUNTER_STATUS, IMetricsProvider } from '../Interface.Metrics'
 import { OMIT_QUEUE_JOB_DATA } from './constants'
 import { executeAgentFlow } from './buildAgentflow'
+
+const getWorkspaceSearchOptionsSafe = (workspaceId?: string) => {
+    if (typeof getWorkspaceSearchOptions === 'function') {
+        return getWorkspaceSearchOptions(workspaceId)
+    }
+    return workspaceId ? { workspaceId } : {}
+}
+
 const shouldAutoPlayTTS = (textToSpeechConfig: string | undefined | null): boolean => {
     if (!textToSpeechConfig) return false
     try {
@@ -547,7 +555,7 @@ export const executeFlow = async ({
     })
 
     /*** Get API Config ***/
-    const availableVariables = await appDataSource.getRepository(Variable).findBy(getWorkspaceSearchOptions(workspaceId))
+    const availableVariables = await appDataSource.getRepository(Variable).findBy(getWorkspaceSearchOptionsSafe(workspaceId))
     const { nodeOverrides, variableOverrides, apiOverrideStatus } = getAPIOverrideConfig(chatflow)
 
     const flowConfig: IFlowConfig = {

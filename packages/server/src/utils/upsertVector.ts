@@ -36,6 +36,13 @@ import { validateFileMimeTypeAndExtensionMatch } from './fileValidation'
 import { checkStorage, updateStorageUsage } from './quotaUsage'
 import { validateFlowAPIKey } from './validateKey'
 
+const getWorkspaceSearchOptionsSafe = (workspaceId?: string) => {
+    if (typeof getWorkspaceSearchOptions === 'function') {
+        return getWorkspaceSearchOptions(workspaceId)
+    }
+    return workspaceId ? { workspaceId } : {}
+}
+
 export const executeUpsert = async ({
     componentNodes,
     incomingInput,
@@ -167,7 +174,7 @@ export const executeUpsert = async ({
     const { startingNodeIds, depthQueue } = getStartingNodes(filteredGraph, stopNodeId)
 
     /*** Get API Config ***/
-    const availableVariables = await appDataSource.getRepository(Variable).findBy(getWorkspaceSearchOptions(chatflow.workspaceId))
+    const availableVariables = await appDataSource.getRepository(Variable).findBy(getWorkspaceSearchOptionsSafe(chatflow.workspaceId))
     const { nodeOverrides, variableOverrides, apiOverrideStatus } = getAPIOverrideConfig(chatflow)
 
     const upsertedResult = await buildFlow({
