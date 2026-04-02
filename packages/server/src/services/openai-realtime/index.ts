@@ -22,6 +22,13 @@ const SOURCE_DOCUMENTS_PREFIX = '\n\n----FLOWISE_SOURCE_DOCUMENTS----\n\n'
 const ARTIFACTS_PREFIX = '\n\n----FLOWISE_ARTIFACTS----\n\n'
 const TOOL_ARGS_PREFIX = '\n\n----FLOWISE_TOOL_ARGS----\n\n'
 
+const getWorkspaceSearchOptionsSafe = (workspaceId?: string) => {
+    if (typeof getWorkspaceSearchOptions === 'function') {
+        return getWorkspaceSearchOptions(workspaceId)
+    }
+    return workspaceId ? { workspaceId } : {}
+}
+
 const buildAndInitTool = async (chatflowid: string, _chatId?: string, _apiMessageId?: string) => {
     const appServer = getRunningExpressApp()
     const chatflow = await appServer.AppDataSource.getRepository(ChatFlow).findOneBy({
@@ -62,7 +69,9 @@ const buildAndInitTool = async (chatflowid: string, _chatId?: string, _apiMessag
     startingNodeIds = [...new Set(startingNodeIds)]
 
     /*** Get API Config ***/
-    const availableVariables = await appServer.AppDataSource.getRepository(Variable).findBy(getWorkspaceSearchOptions(chatflow.workspaceId))
+    const availableVariables = await appServer.AppDataSource.getRepository(Variable).findBy(
+        getWorkspaceSearchOptionsSafe(chatflow.workspaceId)
+    )
     const { nodeOverrides, variableOverrides, apiOverrideStatus } = getAPIOverrideConfig(chatflow)
 
     // This can be public API, so we can only get orgId from the chatflow

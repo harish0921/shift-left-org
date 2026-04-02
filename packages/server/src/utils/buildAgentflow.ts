@@ -149,6 +149,13 @@ const getWorkspaceSearchOptions = (workspaceId?: string) => {
     return {}
 }
 
+const getWorkspaceSearchOptionsSafe = (workspaceId?: string) => {
+    if (typeof getWorkspaceSearchOptions === 'function') {
+        return getWorkspaceSearchOptions(workspaceId)
+    }
+    return workspaceId ? { workspaceId } : {}
+}
+
 const MAX_LOOP_COUNT = process.env.MAX_LOOP_COUNT ? parseInt(process.env.MAX_LOOP_COUNT) : 10
 
 /**
@@ -1086,7 +1093,7 @@ const executeNode = async ({
         }
 
         // Get available variables and resolve them
-        const availableVariables = await appDataSource.getRepository(Variable).findBy(getWorkspaceSearchOptions(workspaceId))
+        const availableVariables = await appDataSource.getRepository(Variable).findBy(getWorkspaceSearchOptionsSafe(workspaceId))
 
         // Prepare flow config
         let updatedState = cloneDeep(agentflowRuntime.state)

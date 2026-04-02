@@ -29,6 +29,13 @@ import { Variable } from '../database/entities/Variable'
 import { DataSource } from 'typeorm'
 import { CachePool } from '../CachePool'
 
+const getWorkspaceSearchOptionsSafe = (workspaceId?: string) => {
+    if (typeof getWorkspaceSearchOptions === 'function') {
+        return getWorkspaceSearchOptions(workspaceId)
+    }
+    return workspaceId ? { workspaceId } : {}
+}
+
 /**
  * Build Agent Graph
  */
@@ -464,7 +471,7 @@ const compileMultiAgentsGraph = async (params: MultiAgentsGraphParams) => {
     const workerNodes = reactFlowNodes.filter((node) => workerNodeIds.includes(node.data.id))
 
     /*** Get API Config ***/
-    const availableVariables = await appDataSource.getRepository(Variable).findBy(getWorkspaceSearchOptions(agentflow.workspaceId))
+    const availableVariables = await appDataSource.getRepository(Variable).findBy(getWorkspaceSearchOptionsSafe(agentflow.workspaceId))
     const { nodeOverrides, variableOverrides, apiOverrideStatus } = getAPIOverrideConfig(agentflow)
 
     let supervisorWorkers: { [key: string]: IMultiAgentNode[] } = {}
@@ -693,7 +700,7 @@ const compileSeqAgentsGraph = async (params: SeqAgentsGraphParams) => {
     let interruptToolNodeNames = []
 
     /*** Get API Config ***/
-    const availableVariables = await appDataSource.getRepository(Variable).findBy(getWorkspaceSearchOptions(agentflow.workspaceId))
+    const availableVariables = await appDataSource.getRepository(Variable).findBy(getWorkspaceSearchOptionsSafe(agentflow.workspaceId))
     const { nodeOverrides, variableOverrides, apiOverrideStatus } = getAPIOverrideConfig(agentflow)
 
     const initiateNode = async (node: IReactFlowNode) => {

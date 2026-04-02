@@ -201,6 +201,11 @@ const getAllCustomTemplates = async (workspaceId?: string): Promise<any> => {
         _modifyTemplates(templates)
         return templates
     } catch (error) {
+        const msg = getErrorMessage(error)
+        // Backward-compatible fallback for older SQLite schemas missing workspaceId on CustomTemplate.
+        if (msg.includes('no such column') && msg.includes('CustomTemplate.workspaceId')) {
+            return []
+        }
         throw new InternalFlowiseError(
             StatusCodes.INTERNAL_SERVER_ERROR,
             `Error: marketplacesService.getAllCustomTemplates - ${getErrorMessage(error)}`
