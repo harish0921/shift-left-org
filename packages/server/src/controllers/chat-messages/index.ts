@@ -151,14 +151,8 @@ const removeAllChatMessages = async (req: Request, res: Response, next: NextFunc
                 'Error: chatMessagesController.removeAllChatMessages - id not provided!'
             )
         }
-        const orgId = req.user?.activeOrganizationId
-        if (!orgId) {
-            throw new InternalFlowiseError(
-                StatusCodes.NOT_FOUND,
-                `Error: chatMessagesController.removeAllChatMessages - organization ${orgId} not found!`
-            )
-        }
-        const workspaceId = req.user?.activeWorkspaceId || ''
+        const orgId = req.user?.activeOrganizationId || req.user?.organizationId || 'unknown'
+        const workspaceId = req.user?.activeWorkspaceId || req.user?.workspaceId || ''
 const chatflowid = req.params.id
         const chatflow = await chatflowsService.getChatflowById(req.params.id, workspaceId)
         if (!chatflow) {
