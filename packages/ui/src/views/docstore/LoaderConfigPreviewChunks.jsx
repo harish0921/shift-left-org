@@ -61,6 +61,7 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 
 const LoaderConfigPreviewChunks = () => {
     const customization = useSelector((state) => state.customization)
+    const currentUser = useSelector((state) => state.auth.user)
     const navigate = useNavigate()
     const theme = useTheme()
     const { error } = useError()
@@ -288,6 +289,13 @@ const LoaderConfigPreviewChunks = () => {
 
         if (selectedDocumentLoader.credential) {
             config.credential = selectedDocumentLoader.credential
+        }
+
+        if (currentUser?.activeOrganizationId) {
+            config.organizationId = currentUser.activeOrganizationId
+        }
+        if (currentUser?.activeWorkspaceId) {
+            config.workspaceId = currentUser.activeWorkspaceId
         }
 
         return config

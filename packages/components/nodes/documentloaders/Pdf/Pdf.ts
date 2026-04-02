@@ -4,6 +4,26 @@ import { TextSplitter } from '@langchain/textsplitters'
 import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf'
 import { getFileFromStorage, handleEscapeCharacters, INodeOutputsValue } from '../../../src'
 
+const loadLegacyPdfJs = async () => {
+    const candidates = [
+        'pdfjs-dist/legacy/build/pdf.js',
+        'pdfjs-dist/legacy/build/pdf.mjs',
+        'pdfjs-dist/build/pdf.mjs'
+    ]
+
+    let lastError: unknown
+    for (const candidate of candidates) {
+        try {
+            // eslint-disable-next-line no-await-in-loop
+            return await import(candidate)
+        } catch (error) {
+            lastError = error
+        }
+    }
+
+    throw lastError
+}
+
 class Pdf_DocumentLoaders implements INode {
     label: string
     name: string
@@ -196,7 +216,7 @@ class Pdf_DocumentLoaders implements INode {
                 splitPages: false,
                 pdfjs: () =>
                     // @ts-ignore
-                    legacyBuild ? import('pdfjs-dist/legacy/build/pdf.js') : import('pdf-parse/lib/pdf.js/v1.10.100/build/pdf.js')
+                    legacyBuild ? loadLegacyPdfJs() : import('pdf-parse/lib/pdf.js/v1.10.100/build/pdf.js')
             })
             if (textSplitter) {
                 let splittedDocs = await loader.load()
@@ -209,7 +229,7 @@ class Pdf_DocumentLoaders implements INode {
             const loader = new PDFLoader(new Blob([new Uint8Array(bf)]), {
                 pdfjs: () =>
                     // @ts-ignore
-                    legacyBuild ? import('pdfjs-dist/legacy/build/pdf.js') : import('pdf-parse/lib/pdf.js/v1.10.100/build/pdf.js')
+                    legacyBuild ? loadLegacyPdfJs() : import('pdf-parse/lib/pdf.js/v1.10.100/build/pdf.js')
             })
             if (textSplitter) {
                 let splittedDocs = await loader.load()

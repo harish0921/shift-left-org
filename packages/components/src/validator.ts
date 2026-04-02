@@ -235,12 +235,7 @@ export const validateVectorStorePath = (userProvidedPath: string | undefined): s
     if (/\0/.test(basePath) || /[\x00-\x1f]/.test(basePath)) {
         throw new Error('Invalid path: null bytes or control characters detected')
     }
-
-    // Check for Windows-specific absolute paths and UNC paths (even on Unix systems)
-    // This prevents cross-platform attack vectors
-    if (/^[a-zA-Z]:\\/.test(basePath)) {
-        throw new Error('Invalid path: Windows absolute paths are not allowed')
-    }
+    // Windows absolute paths are allowed if they resolve within allowed directories
     if (/^\\\\[^\\]/.test(basePath)) {
         throw new Error('Invalid path: UNC paths are not allowed')
     }

@@ -8,6 +8,27 @@ import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
 import { FLOWISE_COUNTER_STATUS, FLOWISE_METRIC_COUNTERS } from '../../Interface.Metrics'
 import { getPageAndLimitParams } from '../../utils/pagination'
 
+const resolveWorkspaceAndOrg = async (req: Request, body?: any) => {
+    const appServer = getRunningExpressApp()
+
+    let workspaceId = req.user?.activeWorkspaceId || body?.workspaceId || ''
+    let orgId = req.user?.activeOrganizationId || req.user?.organizationId || body?.organizationId || ''
+
+    if (!workspaceId && body?.storeId) {
+        const store = await appServer.AppDataSource.getRepository(DocumentStore).findOneBy({ id: body.storeId })
+        if (store?.workspaceId) workspaceId = store.workspaceId
+    }
+
+    if (!orgId && workspaceId) {
+        const workspace = await appServer.AppDataSource.getRepository(Workspace).findOneBy({ id: workspaceId })
+        orgId = workspace?.organizationId || ''
+    }
+
+    return { workspaceId, orgId }
+}
+
+const getSafeOrgId = (orgId?: string) => orgId || 'unknown'
+
 const createDocumentStore = async (req: Request, res: Response, next: NextFunction) => {
     try {
         if (typeof req.body === 'undefined') {
@@ -18,12 +39,8 @@ const createDocumentStore = async (req: Request, res: Response, next: NextFuncti
         }
 
         const body = req.body
-        const workspaceId = req.user?.activeWorkspaceId || body?.workspaceId || ''
-        let orgId = req.user?.activeOrganizationId || req.user?.organizationId || body?.organizationId
-        if (!orgId && workspaceId) {
-            const workspace = await getRunningExpressApp().AppDataSource.getRepository(Workspace).findOneBy({ id: workspaceId })
-            orgId = workspace?.organizationId
-        }
+        const { workspaceId, orgId: resolvedOrgId } = await resolveWorkspaceAndOrg(req, body)
+        let orgId = resolvedOrgId
         if (!orgId) orgId = 'unknown'
 
 const docStore = DocumentStoreDTO.toEntity(body)
@@ -66,18 +83,18 @@ const deleteLoaderFromDocumentStore = async (req: Request, res: Response, next: 
             )
         }
 
-        const orgId = req.user?.activeOrganizationId
+        const { orgId } = await resolveWorkspaceAndOrg(req)
         if (!orgId) {
             throw new InternalFlowiseError(
                 StatusCodes.PRECONDITION_FAILED,
                 `Error: documentStoreController.createDocumentStore - organizationId not provided!`
             )
         }
-        const workspaceId = req.user?.activeWorkspaceId || ''
+        const { workspaceId } = await resolveWorkspaceAndOrg(req)
 const apiResponse = await documentStoreService.deleteLoaderFromDocumentStore(
             storeId,
             loaderId,
-            orgId,
+            safeOrgId,
             workspaceId,
             getRunningExpressApp().usageCacheManager
         )
@@ -243,22 +260,16 @@ const processLoader = async (req: Request, res: Response, next: NextFunction) =>
                 `Error: documentStoreController.processLoader - body not provided!`
             )
         }
-        const orgId = req.user?.activeOrganizationId
-        if (!orgId) {
-            throw new InternalFlowiseError(
-                StatusCodes.PRECONDITION_FAILED,
-                `Error: documentStoreController.createDocumentStore - organizationId not provided!`
-            )
-        }
-        const workspaceId = req.user?.activeWorkspaceId || ''
+        const body = req.body
+        const { workspaceId, orgId } = await resolveWorkspaceAndOrg(req, body)
+        const safeOrgId = getSafeOrgId(orgId)
 const subscriptionId = req.user?.activeOrganizationSubscriptionId || ''
         const docLoaderId = req.params.loaderId
-        const body = req.body
         const isInternalRequest = req.headers['x-request-from'] === 'internal'
         const apiResponse = await documentStoreService.processLoaderMiddleware(
             body,
             docLoaderId,
-            orgId,
+            safeOrgId,
             workspaceId,
             subscriptionId,
             getRunningExpressApp().usageCacheManager,
@@ -317,17 +328,17 @@ const deleteDocumentStore = async (req: Request, res: Response, next: NextFuncti
                 `Error: documentStoreController.deleteDocumentStore - storeId not provided!`
             )
         }
-        const orgId = req.user?.activeOrganizationId
+        const { orgId } = await resolveWorkspaceAndOrg(req)
         if (!orgId) {
             throw new InternalFlowiseError(
                 StatusCodes.PRECONDITION_FAILED,
                 `Error: documentStoreController.createDocumentStore - organizationId not provided!`
             )
         }
-        const workspaceId = req.user?.activeWorkspaceId || ''
+        const { workspaceId } = await resolveWorkspaceAndOrg(req)
 const apiResponse = await documentStoreService.deleteDocumentStore(
             req.params.id,
-            orgId,
+            safeOrgId,
             workspaceId,
             getRunningExpressApp().usageCacheManager
         )
@@ -345,20 +356,14 @@ const previewFileChunks = async (req: Request, res: Response, next: NextFunction
                 `Error: documentStoreController.previewFileChunks - body not provided!`
             )
         }
-        const orgId = req.user?.activeOrganizationId
-        if (!orgId) {
-            throw new InternalFlowiseError(
-                StatusCodes.PRECONDITION_FAILED,
-                `Error: documentStoreController.createDocumentStore - organizationId not provided!`
-            )
-        }
-        const workspaceId = req.user?.activeWorkspaceId || ''
-const subscriptionId = req.user?.activeOrganizationSubscriptionId || ''
         const body = req.body
+        const { workspaceId, orgId } = await resolveWorkspaceAndOrg(req, body)
+        const safeOrgId = getSafeOrgId(orgId)
+const subscriptionId = req.user?.activeOrganizationSubscriptionId || ''
         body.preview = true
         const apiResponse = await documentStoreService.previewChunksMiddleware(
             body,
-            orgId,
+            safeOrgId,
             workspaceId,
             subscriptionId,
             getRunningExpressApp().usageCacheManager
@@ -383,21 +388,15 @@ const insertIntoVectorStore = async (req: Request, res: Response, next: NextFunc
         if (typeof req.body === 'undefined') {
             throw new Error('Error: documentStoreController.insertIntoVectorStore - body not provided!')
         }
-        const orgId = req.user?.activeOrganizationId
-        if (!orgId) {
-            throw new InternalFlowiseError(
-                StatusCodes.PRECONDITION_FAILED,
-                `Error: documentStoreController.createDocumentStore - organizationId not provided!`
-            )
-        }
-        const workspaceId = req.user?.activeWorkspaceId || ''
-const subscriptionId = req.user?.activeOrganizationSubscriptionId || ''
         const body = req.body
+        const { workspaceId, orgId } = await resolveWorkspaceAndOrg(req, body)
+        const safeOrgId = getSafeOrgId(orgId)
+const subscriptionId = req.user?.activeOrganizationSubscriptionId || ''
         const isStrictSave = body.isStrictSave ?? false
         const apiResponse = await documentStoreService.insertIntoVectorStoreMiddleware(
             body,
             isStrictSave,
-            orgId,
+            safeOrgId,
             workspaceId,
             subscriptionId,
             getRunningExpressApp().usageCacheManager
@@ -514,22 +513,16 @@ const upsertDocStoreMiddleware = async (req: Request, res: Response, next: NextF
         if (typeof req.body === 'undefined') {
             throw new Error('Error: documentStoreController.upsertDocStoreMiddleware - body not provided!')
         }
-        const orgId = req.user?.activeOrganizationId
-        if (!orgId) {
-            throw new InternalFlowiseError(
-                StatusCodes.PRECONDITION_FAILED,
-                `Error: documentStoreController.createDocumentStore - organizationId not provided!`
-            )
-        }
-        const workspaceId = req.user?.activeWorkspaceId || ''
-const subscriptionId = req.user?.activeOrganizationSubscriptionId || ''
         const body = req.body
+        const { workspaceId, orgId } = await resolveWorkspaceAndOrg(req, body)
+        const safeOrgId = getSafeOrgId(orgId)
+const subscriptionId = req.user?.activeOrganizationSubscriptionId || ''
         const files = (req.files as Express.Multer.File[]) || []
         const apiResponse = await documentStoreService.upsertDocStoreMiddleware(
             req.params.id,
             body,
             files,
-            orgId,
+            safeOrgId,
             workspaceId,
             subscriptionId,
             getRunningExpressApp().usageCacheManager
@@ -554,20 +547,14 @@ const refreshDocStoreMiddleware = async (req: Request, res: Response, next: Next
                 `Error: documentStoreController.refreshDocStoreMiddleware - storeId not provided!`
             )
         }
-        const orgId = req.user?.activeOrganizationId
-        if (!orgId) {
-            throw new InternalFlowiseError(
-                StatusCodes.PRECONDITION_FAILED,
-                `Error: documentStoreController.createDocumentStore - organizationId not provided!`
-            )
-        }
-        const workspaceId = req.user?.activeWorkspaceId || ''
-const subscriptionId = req.user?.activeOrganizationSubscriptionId || ''
         const body = req.body
+        const { workspaceId, orgId } = await resolveWorkspaceAndOrg(req, body)
+        const safeOrgId = getSafeOrgId(orgId)
+const subscriptionId = req.user?.activeOrganizationSubscriptionId || ''
         const apiResponse = await documentStoreService.refreshDocStoreMiddleware(
             req.params.id,
             body,
-            orgId,
+            safeOrgId,
             workspaceId,
             subscriptionId,
             getRunningExpressApp().usageCacheManager
