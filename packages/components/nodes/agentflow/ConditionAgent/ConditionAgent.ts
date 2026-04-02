@@ -8,7 +8,6 @@ import { findBestScenarioIndex } from './matchScenario'
 import { extractResponseContent } from '../../../src/utils'
 import { getModelConfigByModelName, MODEL_TYPE } from '../../../src/modelLoader'
 import { NodeHtmlMarkdown } from 'node-html-markdown'
-import { getActionableLLMErrorMessage } from '../../../src/error'
 
 class ConditionAgent_Agentflow implements INode {
     label: string
@@ -508,16 +507,14 @@ class ConditionAgent_Agentflow implements INode {
 
             return returnOutput
         } catch (error) {
-            const actionableMessage = getActionableLLMErrorMessage(error)
-
             if (options.analyticHandlers && llmIds) {
-                await options.analyticHandlers.onLLMError(llmIds, actionableMessage)
+                await options.analyticHandlers.onLLMError(llmIds, error instanceof Error ? error.message : String(error))
             }
 
             if (error instanceof Error && error.message === 'Aborted') {
                 throw error
             }
-            throw new Error(`Error in Condition Agent node: ${actionableMessage}`)
+            throw new Error(`Error in Condition Agent node: ${error instanceof Error ? error.message : String(error)}`)
         }
     }
 

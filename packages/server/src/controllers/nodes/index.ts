@@ -3,8 +3,6 @@ import _ from 'lodash'
 import nodesService from '../../services/nodes'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { StatusCodes } from 'http-status-codes'
-import { getWorkspaceSearchOptionsFromReq } from '../../enterprise/utils/ControllerServiceUtils'
-
 const getAllNodes = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const apiResponse = await nodesService.getAllNodes()
@@ -69,7 +67,8 @@ const getSingleNodeAsyncOptions = async (req: Request, res: Response, next: Next
             )
         }
         const body = req.body
-        body.searchOptions = getWorkspaceSearchOptionsFromReq(req)
+        body.searchOptions =
+            typeof getWorkspaceSearchOptionsFromReq === 'function' ? getWorkspaceSearchOptionsFromReq(req) : undefined
         const apiResponse = await nodesService.getSingleNodeAsyncOptions(req.params.name, body)
         return res.json(apiResponse)
     } catch (error) {

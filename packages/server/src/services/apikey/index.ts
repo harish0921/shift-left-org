@@ -1,7 +1,6 @@
 import { StatusCodes } from 'http-status-codes'
 import { v4 as uuidv4 } from 'uuid'
 import { ApiKey } from '../../database/entities/ApiKey'
-import { LoggedInUser } from '../../enterprise/Interface.Enterprise'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getErrorMessage } from '../../errors/utils'
 import { Platform } from '../../Interface'
@@ -17,7 +16,7 @@ import logger from '../../utils/logger'
  * @param operation - The operation being performed (for error message)
  * @throws InternalFlowiseError if validation fails
  */
-function validatePermissions(user: LoggedInUser, requestedPermissions: string[], operation: string) {
+function validatePermissions(user: LoggedInUser | undefined, requestedPermissions: string[], operation: string) {
     // API Keys should not have workspace or admin permissions
     // This applies to ALL users, including admins (platform constraint)
     const hasRestrictedPermissions = requestedPermissions.some(
@@ -31,7 +30,7 @@ function validatePermissions(user: LoggedInUser, requestedPermissions: string[],
     // For Cloud platform, check feature-gated permissions
     // This also applies to ALL users, including admins (platform constraint)
     const appServer = getRunningExpressApp()
-    if (appServer.identityManager.getPlatformType() === Platform.CLOUD) {
+    if (appServer.identityManager.getPlatformType() === Platform.CLOUD && user) {
         if (!user.features) {
             // On Cloud platform, user features should always exist
             // Log the anomaly with context for debugging
@@ -75,7 +74,7 @@ function validatePermissions(user: LoggedInUser, requestedPermissions: string[],
     }
 
     // User permission validation - only applies to non-admins (authorization check)
-    if (!user.isOrganizationAdmin) {
+    if (user && !user.isOrganizationAdmin) {
         // Check if all requested permissions are included in user permissions
         const hasInvalidPermissions = requestedPermissions.some((permission: string) => !user.permissions.includes(permission))
         if (hasInvalidPermissions) {
@@ -106,7 +105,7 @@ async function getAllApiKeysByOrganization(organizationId: string): Promise<ApiK
  * Get all API keys for a workspace
  * Non-admin users can only view API keys whose permissions are a subset of their own permissions
  */
-const getAllApiKeys = async (user: LoggedInUser, page: number = -1, limit: number = -1) => {
+const getAllApiKeys = async (user: LoggedInUser | undefined, page: number = -1, limit: number = -1) => {
     try {
         const appServer = getRunningExpressApp()
         const queryBuilder = appServer.AppDataSource.getRepository(ApiKey)
@@ -116,12 +115,11 @@ const getAllApiKeys = async (user: LoggedInUser, page: number = -1, limit: numbe
             queryBuilder.skip((page - 1) * limit)
             queryBuilder.take(limit)
         }
-        queryBuilder.andWhere('api_key.workspaceId = :workspaceId', { workspaceId: user.activeWorkspaceId })
         const allKeys = await queryBuilder.getMany()
 
         // Filter keys based on user permissions
         let filteredKeys = allKeys
-        if (!user.isOrganizationAdmin) {
+        if (user && !user.isOrganizationAdmin) {
             // Non-admin users can only see API keys whose permissions are a subset of their own
             filteredKeys = allKeys.filter((key) => {
                 // Check if all key permissions are included in user permissions
@@ -171,10 +169,7 @@ const getApiKeyById = async (apiKeyId: string) => {
     }
 }
 
-const createApiKey = async (user: LoggedInUser, keyName: string, permissions: string[]) => {
-    // Validate permissions before creating the key
-    validatePermissions(user, permissions, 'create')
-
+const createApiKey = async (keyName: string) => {
     const apiKey = generateAPIKey()
     const apiSecret = generateSecretHash(apiKey)
     const appServer = getRunningExpressApp()
@@ -183,11 +178,10 @@ const createApiKey = async (user: LoggedInUser, keyName: string, permissions: st
     newKey.apiKey = apiKey
     newKey.apiSecret = apiSecret
     newKey.keyName = keyName
-    newKey.permissions = permissions
-    newKey.workspaceId = user.activeWorkspaceId
+    newKey.permissions = []
     const key = appServer.AppDataSource.getRepository(ApiKey).create(newKey)
     await appServer.AppDataSource.getRepository(ApiKey).save(key)
-    return await getAllApiKeys(user)
+    return await getAllApiKeys(undefined)
 }
 
 // Update api key
@@ -209,10 +203,10 @@ const updateApiKey = async (user: LoggedInUser, id: string, keyName: string, per
     return await getAllApiKeys(user)
 }
 
-const deleteApiKey = async (id: string, workspaceId: string) => {
+const deleteApiKey = async (id: string) => {
     try {
         const appServer = getRunningExpressApp()
-        const dbResponse = await appServer.AppDataSource.getRepository(ApiKey).delete({ id, workspaceId })
+        const dbResponse = await appServer.AppDataSource.getRepository(ApiKey).delete({ id })
         if (!dbResponse) {
             throw new InternalFlowiseError(StatusCodes.NOT_FOUND, `ApiKey ${id} not found`)
         }

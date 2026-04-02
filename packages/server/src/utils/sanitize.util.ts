@@ -1,5 +1,3 @@
-import { User } from '../enterprise/database/entities/user.entity'
-
 export function sanitizeNullBytes(obj: any): any {
     const stack = [obj]
 
@@ -33,7 +31,7 @@ export function sanitizeNullBytes(obj: any): any {
     return obj
 }
 
-export function sanitizeUser(user: Partial<User>) {
+export function sanitizeUser(user: any) {
     delete user.credential
     delete user.tempToken
     delete user.tokenExpiry

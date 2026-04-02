@@ -56,7 +56,6 @@ import { utilAddChatMessage } from './addChatMesage'
 import { CachePool } from '../CachePool'
 import { ChatMessage } from '../database/entities/ChatMessage'
 import { Telemetry } from './telemetry'
-import { getWorkspaceSearchOptions } from '../enterprise/utils/ControllerServiceUtils'
 import { UsageCacheManager } from '../UsageCacheManager'
 import { generateTTSForResponseStream, shouldAutoPlayTTS } from './buildChatflow'
 
@@ -143,6 +142,11 @@ interface IExecuteNodeParams {
 
 interface IExecuteAgentFlowParams extends Omit<IExecuteFlowParams, 'incomingInput'> {
     incomingInput: IncomingAgentflowInput
+}
+
+const getWorkspaceSearchOptions = (workspaceId?: string) => {
+    if (workspaceId) return { workspaceId }
+    return {}
 }
 
 const MAX_LOOP_COUNT = process.env.MAX_LOOP_COUNT ? parseInt(process.env.MAX_LOOP_COUNT) : 10

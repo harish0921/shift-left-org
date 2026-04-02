@@ -158,14 +158,8 @@ const removeAllChatMessages = async (req: Request, res: Response, next: NextFunc
                 `Error: chatMessagesController.removeAllChatMessages - organization ${orgId} not found!`
             )
         }
-        const workspaceId = req.user?.activeWorkspaceId
-        if (!workspaceId) {
-            throw new InternalFlowiseError(
-                StatusCodes.NOT_FOUND,
-                `Error: chatMessagesController.removeAllChatMessages - workspace ${workspaceId} not found!`
-            )
-        }
-        const chatflowid = req.params.id
+        const workspaceId = req.user?.activeWorkspaceId || ''
+const chatflowid = req.params.id
         const chatflow = await chatflowsService.getChatflowById(req.params.id, workspaceId)
         if (!chatflow) {
             return res.status(404).send('Chatflow not found')
