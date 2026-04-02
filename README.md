@@ -1,6 +1,6 @@
 # ShiftLeft
 
-No-code AI flow builder — build and deploy AI agents visually.
+No-code AI flow builder - build and deploy AI agents visually.
 
 ## Requirements
 
@@ -8,51 +8,108 @@ No-code AI flow builder — build and deploy AI agents visually.
 - pnpm >= 8.0.0
 
 Install pnpm if you don't have it:
-  npm install -g pnpm
+
+```powershell
+npm install -g pnpm
+```
 
 ## Quick Start
 
 ### 1. Clone the repo
-  git clone <your-repo-url>
-  cd shiftleft
 
-### 2. Install dependencies
-  pnpm install
+```powershell
+git clone <your-repo-url>
+cd shiftleft
+```
 
-### 3. Setup environment files
-  cp packages/server/.env.example packages/server/.env
-  cp packages/ui/.env.example packages/ui/.env
+## Windows Local Setup (Exact Path)
 
-Edit packages/server/.env and set a secure SECRETKEY value.
+Use this exact repository path:
 
-### 4. Start development servers
-  pnpm dev
+```powershell
+cd C:\Users\SYS-02\Desktop\nocode-main\nocode-main
+```
 
-### 5. Open in browser
-  Frontend: http://localhost:8080
-  Backend API: http://localhost:3000
+### First-time setup (run once)
+
+```powershell
+cd C:\Users\SYS-02\Desktop\nocode-main\nocode-main
+pnpm install
+Copy-Item packages/server/.env.example packages/server/.env
+Copy-Item packages/ui/.env.example packages/ui/.env
+pnpm --filter @flowiseai/components build
+pnpm --filter shiftleft-server build
+```
+
+### Backend startup blocker fix
+
+Build components once before running dev servers:
+
+```powershell
+pnpm --filter @flowiseai/components build
+```
+
+### Long/stable run (use 2 terminals)
+
+Terminal 1 (Backend):
+
+```powershell
+cd C:\Users\SYS-02\Desktop\nocode-main\nocode-main
+pnpm --filter shiftleft-server dev
+```
+
+Terminal 2 (Frontend):
+
+```powershell
+cd C:\Users\SYS-02\Desktop\nocode-main\nocode-main
+pnpm --filter shiftleft-ui dev -- --port 8080 --host
+```
+
+### If ports are stuck before starting
+
+```powershell
+npx kill-port 8080 3000
+```
+
+### Open in browser
+
+- Frontend: http://localhost:8080
+- Backend: http://localhost:3000
 
 ## Build for production
-  pnpm build
+
+```powershell
+pnpm build
+```
 
 ## Project structure
-  packages/
-    server/       ? Node.js + Express API backend
-    ui/           ? React frontend (Vite)
-    components/   ? AI nodes and integrations
+
+```text
+packages/
+  server/       - Node.js + Express API backend
+  ui/           - React frontend (Vite)
+  components/   - AI nodes and integrations
+```
 
 ## Environment variables
 
 ### packages/server/.env
-  PORT=3000
-  DATABASE_TYPE=sqlite
-  DATABASE_PATH=./database.sqlite
-  SECRETKEY=your_secret_key_here
-  CORS_ORIGIN=http://localhost:8080
+
+```env
+PORT=3000
+DATABASE_TYPE=sqlite
+DATABASE_PATH=./database.sqlite
+SECRETKEY=your_secret_key_here
+CORS_ORIGIN=http://localhost:8080
+```
 
 ### packages/ui/.env
-  VITE_PORT=8080
-  VITE_API_URL=http://localhost:3000
+
+```env
+VITE_PORT=8080
+VITE_API_URL=http://localhost:3000
+```
 
 ## License
-Apache 2.0 — see LICENSE file.
+
+Apache 2.0 - see LICENSE file.
