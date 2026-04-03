@@ -9,6 +9,17 @@ import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
 
 import csv from 'csv-parser'
 
+const findDatasetById = async (id: string, workspaceId?: string) => {
+    const appServer = getRunningExpressApp()
+    if (workspaceId) {
+        return await appServer.AppDataSource.getRepository(Dataset).findOneBy({
+            id,
+            workspaceId
+        })
+    }
+    return await appServer.AppDataSource.getRepository(Dataset).findOneBy({ id })
+}
+
 const getAllDatasets = async (workspaceId: string, page: number = -1, limit: number = -1) => {
     try {
         const appServer = getRunningExpressApp()
@@ -46,10 +57,7 @@ const getAllDatasets = async (workspaceId: string, page: number = -1, limit: num
 const getDataset = async (id: string, workspaceId: string, page: number = -1, limit: number = -1) => {
     try {
         const appServer = getRunningExpressApp()
-        const dataset = await appServer.AppDataSource.getRepository(Dataset).findOneBy({
-            id: id,
-            workspaceId: workspaceId
-        })
+        const dataset = await findDatasetById(id, workspaceId)
         if (!dataset) throw new InternalFlowiseError(StatusCodes.NOT_FOUND, `Dataset ${id} not found`)
         const queryBuilder = appServer.AppDataSource.getRepository(DatasetRow).createQueryBuilder('dsr').orderBy('dsr.sequenceNo', 'ASC')
         queryBuilder.andWhere('dsr.datasetId = :datasetId', { datasetId: id })
@@ -216,10 +224,7 @@ const createDataset = async (body: any) => {
 const updateDataset = async (id: string, body: any, workspaceId: string) => {
     try {
         const appServer = getRunningExpressApp()
-        const dataset = await appServer.AppDataSource.getRepository(Dataset).findOneBy({
-            id: id,
-            workspaceId: workspaceId
-        })
+        const dataset = await findDatasetById(id, workspaceId)
         if (!dataset) throw new InternalFlowiseError(StatusCodes.NOT_FOUND, `Dataset ${id} not found`)
 
         const updateDataset = new Dataset()
@@ -236,7 +241,8 @@ const updateDataset = async (id: string, body: any, workspaceId: string) => {
 const deleteDataset = async (id: string, workspaceId: string) => {
     try {
         const appServer = getRunningExpressApp()
-        const result = await appServer.AppDataSource.getRepository(Dataset).delete({ id: id, workspaceId: workspaceId })
+        const deleteCriteria = workspaceId ? { id, workspaceId } : { id }
+        const result = await appServer.AppDataSource.getRepository(Dataset).delete(deleteCriteria)
 
         // delete all rows for this dataset
         await appServer.AppDataSource.getRepository(DatasetRow).delete({ datasetId: id })
@@ -288,10 +294,7 @@ const addDatasetRow = async (body: any) => {
 
 const changeUpdateOnDataset = async (id: string, workspaceId: string, entityManager?: any) => {
     const appServer = getRunningExpressApp()
-    const dataset = await appServer.AppDataSource.getRepository(Dataset).findOneBy({
-        id: id,
-        workspaceId: workspaceId
-    })
+    const dataset = await findDatasetById(id, workspaceId)
     if (!dataset) throw new InternalFlowiseError(StatusCodes.NOT_FOUND, `Dataset ${id} not found`)
 
     dataset.updatedDate = new Date()
