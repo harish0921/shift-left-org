@@ -88,7 +88,10 @@ const OpenAIAssistantLayout = () => {
 
     function filterAssistants(data) {
         const parsedData = JSON.parse(data.details)
-        return parsedData && parsedData.name && parsedData.name.toLowerCase().indexOf(search.toLowerCase()) > -1
+        const assistantName = (parsedData?.name || '').toString()
+        const assistantId = (parsedData?.id || data?.id || '').toString()
+        const needle = search.toLowerCase()
+        return assistantName.toLowerCase().includes(needle) || assistantId.toLowerCase().includes(needle)
     }
 
     useEffect(() => {
@@ -151,17 +154,22 @@ const OpenAIAssistantLayout = () => {
                         ) : (
                             <Box display='grid' gridTemplateColumns='repeat(3, 1fr)' gap={gridSpacing}>
                                 {getAllAssistantsApi.data &&
-                                    getAllAssistantsApi.data?.filter(filterAssistants).map((data, index) => (
+                                    getAllAssistantsApi.data?.filter(filterAssistants).map((data, index) => {
+                                        const details = JSON.parse(data.details)
+                                        const displayName = details?.name?.trim() || details?.id || 'Untitled Assistant'
+                                        const displayDescription = details?.instructions || details?.description || ''
+                                        return (
                                         <ItemCard
                                             data={{
-                                                name: JSON.parse(data.details)?.name,
-                                                description: JSON.parse(data.details)?.instructions,
+                                                name: displayName,
+                                                description: displayDescription,
                                                 iconSrc: data.iconSrc
                                             }}
                                             key={index}
                                             onClick={() => edit(data)}
                                         />
-                                    ))}
+                                        )
+                                    })}
                             </Box>
                         )}
                         {!isLoading && (!getAllAssistantsApi.data || getAllAssistantsApi.data.length === 0) && (

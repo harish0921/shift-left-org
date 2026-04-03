@@ -6,6 +6,14 @@ import assistantsService from '../../services/assistants'
 import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
 import { checkUsageLimit } from '../../utils/quotaUsage'
 
+const resolveWorkspaceId = (req: Request, body?: any) => {
+    return req.user?.activeWorkspaceId || req.user?.workspaceId || body?.workspaceId || ''
+}
+
+const resolveOrgId = (req: Request, body?: any) => {
+    return req.user?.activeOrganizationId || req.user?.organizationId || body?.organizationId || 'unknown'
+}
+
 const createAssistant = async (req: Request, res: Response, next: NextFunction) => {
     try {
         if (!req.body) {
@@ -15,15 +23,9 @@ const createAssistant = async (req: Request, res: Response, next: NextFunction) 
             )
         }
         const body = req.body
-        const orgId = req.user?.activeOrganizationId
-        if (!orgId) {
-            throw new InternalFlowiseError(
-                StatusCodes.NOT_FOUND,
-                `Error: assistantsController.createAssistant - organization ${orgId} not found!`
-            )
-        }
-        const workspaceId = req.user?.activeWorkspaceId || ''
-const subscriptionId = req.user?.activeOrganizationSubscriptionId || ''
+        const orgId = resolveOrgId(req, body)
+        const workspaceId = resolveWorkspaceId(req, body)
+        const subscriptionId = req.user?.activeOrganizationSubscriptionId || req.user?.organizationSubscriptionId || ''
 
         const existingAssistantCount = await assistantsService.getAssistantsCountByOrganization(body.type, orgId)
         const newAssistantCount = 1
@@ -46,8 +48,8 @@ const deleteAssistant = async (req: Request, res: Response, next: NextFunction) 
                 `Error: assistantsController.deleteAssistant - id not provided!`
             )
         }
-        const workspaceId = req.user?.activeWorkspaceId || ''
-const apiResponse = await assistantsService.deleteAssistant(req.params.id, req.query.isDeleteBoth, workspaceId)
+        const workspaceId = resolveWorkspaceId(req)
+        const apiResponse = await assistantsService.deleteAssistant(req.params.id, req.query.isDeleteBoth, workspaceId)
         return res.json(apiResponse)
     } catch (error) {
         next(error)
@@ -57,8 +59,8 @@ const apiResponse = await assistantsService.deleteAssistant(req.params.id, req.q
 const getAllAssistants = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const type = req.query.type as AssistantType
-        const workspaceId = req.user?.activeWorkspaceId || ''
-const apiResponse = await assistantsService.getAllAssistants(workspaceId, type)
+        const workspaceId = resolveWorkspaceId(req)
+        const apiResponse = await assistantsService.getAllAssistants(workspaceId, type)
         return res.json(apiResponse)
     } catch (error) {
         next(error)
@@ -73,8 +75,8 @@ const getAssistantById = async (req: Request, res: Response, next: NextFunction)
                 `Error: assistantsController.getAssistantById - id not provided!`
             )
         }
-        const workspaceId = req.user?.activeWorkspaceId || ''
-const apiResponse = await assistantsService.getAssistantById(req.params.id, workspaceId)
+        const workspaceId = resolveWorkspaceId(req)
+        const apiResponse = await assistantsService.getAssistantById(req.params.id, workspaceId)
         return res.json(apiResponse)
     } catch (error) {
         next(error)
@@ -95,8 +97,8 @@ const updateAssistant = async (req: Request, res: Response, next: NextFunction) 
                 `Error: assistantsController.updateAssistant - body not provided!`
             )
         }
-        const workspaceId = req.user?.activeWorkspaceId || ''
-const apiResponse = await assistantsService.updateAssistant(req.params.id, req.body, workspaceId)
+        const workspaceId = resolveWorkspaceId(req, req.body)
+        const apiResponse = await assistantsService.updateAssistant(req.params.id, req.body, workspaceId)
         return res.json(apiResponse)
     } catch (error) {
         next(error)
@@ -114,8 +116,8 @@ const getChatModels = async (req: Request, res: Response, next: NextFunction) =>
 
 const getDocumentStores = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const workspaceId = req.user?.activeWorkspaceId || ''
-const apiResponse = await assistantsService.getDocumentStores(workspaceId)
+        const workspaceId = resolveWorkspaceId(req)
+        const apiResponse = await assistantsService.getDocumentStores(workspaceId)
         return res.json(apiResponse)
     } catch (error) {
         next(error)

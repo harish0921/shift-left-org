@@ -5,6 +5,14 @@ import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { StatusCodes } from 'http-status-codes'
 import { getPageAndLimitParams } from '../../utils/pagination'
 
+const resolveWorkspaceId = (req: Request, body?: any) => {
+    return req.user?.activeWorkspaceId || req.user?.workspaceId || body?.workspaceId || ''
+}
+
+const resolveOrgId = (req: Request, body?: any) => {
+    return req.user?.activeOrganizationId || req.user?.organizationId || body?.organizationId || 'unknown'
+}
+
 const createVariable = async (req: Request, res: Response, next: NextFunction) => {
     try {
         if (typeof req.body === 'undefined') {
@@ -13,12 +21,9 @@ const createVariable = async (req: Request, res: Response, next: NextFunction) =
                 `Error: variablesController.createVariable - body not provided!`
             )
         }
-        const orgId = req.user?.activeOrganizationId
-        if (!orgId) {
-            throw new InternalFlowiseError(StatusCodes.NOT_FOUND, `Error: toolsController.createTool - organization ${orgId} not found!`)
-        }
-        const workspaceId = req.user?.activeWorkspaceId || ''
-const body = req.body
+        const body = req.body
+        const orgId = resolveOrgId(req, body)
+        const workspaceId = resolveWorkspaceId(req, body)
         body.workspaceId = workspaceId
         const newVariable = new Variable()
         Object.assign(newVariable, body)
@@ -34,8 +39,8 @@ const deleteVariable = async (req: Request, res: Response, next: NextFunction) =
         if (typeof req.params === 'undefined' || !req.params.id) {
             throw new InternalFlowiseError(StatusCodes.PRECONDITION_FAILED, 'Error: variablesController.deleteVariable - id not provided!')
         }
-        const workspaceId = req.user?.activeWorkspaceId || ''
-const apiResponse = await variablesService.deleteVariable(req.params.id, workspaceId)
+        const workspaceId = resolveWorkspaceId(req)
+        const apiResponse = await variablesService.deleteVariable(req.params.id, workspaceId)
         return res.json(apiResponse)
     } catch (error) {
         next(error)
@@ -45,8 +50,8 @@ const apiResponse = await variablesService.deleteVariable(req.params.id, workspa
 const getAllVariables = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { page, limit } = getPageAndLimitParams(req)
-        const workspaceId = req.user?.activeWorkspaceId || ''
-const apiResponse = await variablesService.getAllVariables(workspaceId, page, limit)
+        const workspaceId = resolveWorkspaceId(req)
+        const apiResponse = await variablesService.getAllVariables(workspaceId, page, limit)
         return res.json(apiResponse)
     } catch (error) {
         next(error)
@@ -64,8 +69,8 @@ const updateVariable = async (req: Request, res: Response, next: NextFunction) =
                 'Error: variablesController.updateVariable - body not provided!'
             )
         }
-        const workspaceId = req.user?.activeWorkspaceId || ''
-const variable = await variablesService.getVariableById(req.params.id, workspaceId)
+        const workspaceId = resolveWorkspaceId(req, req.body)
+        const variable = await variablesService.getVariableById(req.params.id, workspaceId)
         if (!variable) {
             return res.status(404).send('Variable not found in the database')
         }
