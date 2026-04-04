@@ -15,23 +15,13 @@ import OrgWorkspaceBreadcrumbs from '@/layout/MainLayout/Header/OrgWorkspaceBrea
 import PricingDialog from '@/ui-component/subscription/PricingDialog'
 
 // assets
-import { IconMenu2, IconX, IconSparkles } from '@tabler/icons-react'
+import { IconMenu2, IconSparkles } from '@tabler/icons-react'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import LightModeIcon from '@mui/icons-material/LightMode'
 
 // store
-import { store } from '@/store'
 import { SET_DARKMODE } from '@/store/actions'
 import { useConfig } from '@/store/context/ConfigContext'
-import { enqueueSnackbar as enqueueSnackbarAction, closeSnackbar as closeSnackbarAction } from '@/store/actions'
-import { logoutSuccess } from '@/store/reducers/authSlice'
-
-// API
-import accountApi from '@/api/account.api'
-
-// Hooks
-import useApi from '@/hooks/useApi'
-import useNotifier from '@/utils/useNotifier'
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
 
@@ -40,7 +30,6 @@ const Header = ({ handleLeftDrawerToggle }) => {
     const navigate = useNavigate()
 
     const customization = useSelector((state) => state.customization)
-    const logoutApi = useApi(accountApi.logout)
 
     const [isDark, setIsDark] = useState(customization.isDarkMode)
     const dispatch = useDispatch()
@@ -49,11 +38,6 @@ const Header = ({ handleLeftDrawerToggle }) => {
     const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
     const shouldShowMenuToggle = isOpenSource || isAuthenticated
     const [isPricingOpen, setIsPricingOpen] = useState(false)
-
-    useNotifier()
-
-    const enqueueSnackbar = (...args) => dispatch(enqueueSnackbarAction(...args))
-    const closeSnackbar = (...args) => dispatch(closeSnackbarAction(...args))
 
     const changeDarkMode = () => {
         dispatch({ type: SET_DARKMODE, isDarkMode: !isDark })
@@ -64,33 +48,6 @@ const Header = ({ handleLeftDrawerToggle }) => {
     useEffect(() => {
         setIsDark(customization.isDarkMode)
     }, [customization.isDarkMode])
-
-    const signOutClicked = () => {
-        logoutApi.request()
-        enqueueSnackbar({
-            message: 'Logging out...',
-            options: {
-                key: new Date().getTime() + Math.random(),
-                variant: 'success',
-                action: (key) => (
-                    <Button style={{ color: 'white' }} onClick={() => closeSnackbar(key)}>
-                        <IconX />
-                    </Button>
-                )
-            }
-        })
-    }
-
-    useEffect(() => {
-        try {
-            if (logoutApi.data && logoutApi.data.message === 'logged_out') {
-                store.dispatch(logoutSuccess())
-                window.location.href = logoutApi.data.redirectTo
-            }
-        } catch (e) {
-            console.error(e)
-        }
-    }, [logoutApi.data])
 
     return (
         <>
@@ -184,7 +141,7 @@ const Header = ({ handleLeftDrawerToggle }) => {
                 </IconButton>
             </Tooltip>
             <Box sx={{ ml: 2 }}></Box>
-            <ProfileSection handleLogout={signOutClicked} />
+            <ProfileSection />
         </>
     )
 }
@@ -194,4 +151,3 @@ Header.propTypes = {
 }
 
 export default Header
-
