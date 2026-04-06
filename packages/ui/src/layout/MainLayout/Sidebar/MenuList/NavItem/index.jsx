@@ -21,6 +21,7 @@ const NavItem = ({ item, level, navType, onClick, onUploadFile }) => {
     const dispatch = useDispatch()
     const customization = useSelector((state) => state.customization)
     const matchesSM = useMediaQuery(theme.breakpoints.down('lg'))
+    const isMiniMode = !customization.opened && !matchesSM
 
     const Icon = item.icon
     const itemIcon = item?.icon ? (
@@ -99,38 +100,43 @@ const NavItem = ({ item, level, navType, onClick, onUploadFile }) => {
         <ListItemButton
             {...listItemProps}
             disabled={item.disabled}
+            title={isMiniMode ? item.title : undefined}
             sx={{
                 borderRadius: `${customization.borderRadius}px`,
-                alignItems: 'flex-start',
+                alignItems: isMiniMode ? 'center' : 'flex-start',
+                justifyContent: isMiniMode ? 'center' : 'flex-start',
                 backgroundColor: level > 1 ? 'transparent !important' : 'inherit',
                 py: level > 1 ? 1 : 1.25,
-                pl: `${level * 24}px`
+                pl: isMiniMode ? 1 : `${level * 24}px`,
+                pr: isMiniMode ? 1 : 1.5
             }}
             selected={customization.isOpen.findIndex((id) => id === item.id) > -1}
             onClick={() => itemHandler(item.id)}
         >
             {item.id === 'loadChatflow' && <input type='file' hidden accept='.json' onChange={(e) => handleFileUpload(e)} />}
-            <ListItemIcon sx={{ my: 'auto', minWidth: !item?.icon ? 18 : 36 }}>{itemIcon}</ListItemIcon>
-            <ListItemText
-                primary={
-                    <Typography
-                        variant={customization.isOpen.findIndex((id) => id === item.id) > -1 ? 'h5' : 'body1'}
-                        color='inherit'
-                        sx={{ my: 0.5 }}
-                    >
-                        {item.title}
-                    </Typography>
-                }
-                secondary={
-                    item.caption && (
-                        <Typography variant='caption' sx={{ ...theme.typography.subMenuCaption, mt: -0.6 }} display='block' gutterBottom>
-                            {item.caption}
+            <ListItemIcon sx={{ my: 'auto', minWidth: isMiniMode ? 'auto' : !item?.icon ? 18 : 36 }}>{itemIcon}</ListItemIcon>
+            {!isMiniMode && (
+                <ListItemText
+                    primary={
+                        <Typography
+                            variant={customization.isOpen.findIndex((id) => id === item.id) > -1 ? 'h5' : 'body1'}
+                            color='inherit'
+                            sx={{ my: 0.5 }}
+                        >
+                            {item.title}
                         </Typography>
-                    )
-                }
-                sx={{ my: 'auto' }}
-            />
-            {item.chip && (
+                    }
+                    secondary={
+                        item.caption && (
+                            <Typography variant='caption' sx={{ ...theme.typography.subMenuCaption, mt: -0.6 }} display='block' gutterBottom>
+                                {item.caption}
+                            </Typography>
+                        )
+                    }
+                    sx={{ my: 'auto' }}
+                />
+            )}
+            {!isMiniMode && item.chip && (
                 <Chip
                     color={item.chip.color}
                     variant={item.chip.variant}
@@ -139,7 +145,7 @@ const NavItem = ({ item, level, navType, onClick, onUploadFile }) => {
                     avatar={item.chip.avatar && <Avatar>{item.chip.avatar}</Avatar>}
                 />
             )}
-            {item.isBeta && (
+            {!isMiniMode && item.isBeta && (
                 <Chip
                     sx={{
                         my: 'auto',

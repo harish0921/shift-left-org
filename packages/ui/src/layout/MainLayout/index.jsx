@@ -12,6 +12,8 @@ import Sidebar from './Sidebar'
 import { drawerWidth, headerHeight } from '@/store/constant'
 import { SET_MENU } from '@/store/actions'
 
+const miniDrawerWidth = 88
+
 // styles
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
     ...theme.typography.mainContent,
@@ -25,8 +27,8 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({
         }),
         marginRight: 0,
         [theme.breakpoints.up('md')]: {
-            marginLeft: -drawerWidth,
-            width: `calc(100% - ${drawerWidth}px)`
+            marginLeft: 0,
+            width: `calc(100% - ${miniDrawerWidth}px)`
         },
         [theme.breakpoints.down('md')]: {
             marginLeft: '20px',
@@ -90,13 +92,19 @@ const MainLayout = () => {
                 color='inherit'
                 elevation={0}
                 sx={{
-                    bgcolor: theme.palette.mode === 'light' ? '#FFF7F0' : 'rgba(8,11,16,0.68)',
-                    backdropFilter: theme.palette.mode === 'dark' ? 'blur(16px)' : 'none',
-                    WebkitBackdropFilter: theme.palette.mode === 'dark' ? 'blur(16px)' : 'none',
+                    bgcolor: theme.palette.mode === 'light' ? 'rgba(255,247,240,0.72)' : 'rgba(8,11,16,0.82)',
+                    backdropFilter: 'blur(16px)',
+                    WebkitBackdropFilter: 'blur(16px)',
                     transition: leftDrawerOpened ? theme.transitions.create('width') : 'none'
                 }}
             >
-                <Toolbar sx={{ height: `${headerHeight}px`, borderBottom: '1px solid', borderColor: theme.palette.mode === 'light' ? '#FFDCC8' : 'rgba(255,255,255,0.08)' }}>
+                <Toolbar
+                    sx={{
+                        height: `${headerHeight}px`,
+                        borderBottom: '1px solid',
+                        borderColor: theme.palette.mode === 'light' ? 'rgba(255,188,155,0.45)' : 'rgba(143, 170, 204, 0.16)'
+                    }}
+                >
                     <Header handleLeftDrawerToggle={handleLeftDrawerToggle} />
                 </Toolbar>
             </AppBar>

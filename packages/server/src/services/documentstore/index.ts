@@ -96,7 +96,9 @@ const getAllDocumentStores = async (workspaceId: string, page: number = -1, limi
             queryBuilder.skip((page - 1) * limit)
             queryBuilder.take(limit)
         }
-        queryBuilder.andWhere('doc_store.workspaceId = :workspaceId', { workspaceId })
+        if (workspaceId) {
+            queryBuilder.andWhere('doc_store.workspaceId = :workspaceId', { workspaceId })
+        }
 
         const [data, total] = await queryBuilder.getManyAndCount()
 

@@ -1064,7 +1064,9 @@ export const redirectWhenUnauthorized = ({ error, redirectTo }) => {
 }
 
 export const truncateString = (str, maxLength) => {
-    return str.length > maxLength ? `${str.slice(0, maxLength - 3)}...` : str
+    if (str === null || str === undefined) return ''
+    const safeStr = typeof str === 'string' ? str : String(str)
+    return safeStr.length > maxLength ? `${safeStr.slice(0, maxLength - 3)}...` : safeStr
 }
 
 const toCamelCase = (str) => {

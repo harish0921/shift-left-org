@@ -1037,7 +1037,7 @@ export const utilBuildChatflow = async (req: Request, isInternal: boolean = fals
         }
 
         // Prefer authenticated context; fall back safely for OSS builds where enterprise globals may be unavailable.
-        let workspaceId = req.user?.activeWorkspaceId || chatflow.workspaceId || ''
+        let workspaceId = req.user?.activeWorkspaceId || chatflow.workspaceId || undefined
         let orgId = req.user?.activeOrganizationId || ''
         let subscriptionId = req.user?.activeOrganizationSubscriptionId || ''
 
@@ -1059,7 +1059,6 @@ export const utilBuildChatflow = async (req: Request, isInternal: boolean = fals
         }
 
         if (!orgId) orgId = 'unknown'
-        if (!workspaceId) workspaceId = ''
         organizationId = orgId
         const productId = subscriptionId ? await appServer.identityManager.getProductIdFromSubscription(subscriptionId) : ''
 

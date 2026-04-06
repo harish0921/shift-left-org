@@ -7,7 +7,7 @@ import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
 import { checkUsageLimit } from '../../utils/quotaUsage'
 
 const resolveWorkspaceId = (req: Request, body?: any) => {
-    return req.user?.activeWorkspaceId || req.user?.workspaceId || body?.workspaceId || ''
+    return req.user?.activeWorkspaceId || req.user?.workspaceId || body?.workspaceId
 }
 
 const resolveOrgId = (req: Request, body?: any) => {
@@ -25,7 +25,7 @@ const createAssistant = async (req: Request, res: Response, next: NextFunction) 
         const body = req.body
         const orgId = resolveOrgId(req, body)
         const workspaceId = resolveWorkspaceId(req, body)
-        const subscriptionId = req.user?.activeOrganizationSubscriptionId || req.user?.organizationSubscriptionId || ''
+        const subscriptionId = req.user?.activeOrganizationSubscriptionId || req.user?.organizationSubscriptionId
 
         const existingAssistantCount = await assistantsService.getAssistantsCountByOrganization(body.type, orgId)
         const newAssistantCount = 1
@@ -159,3 +159,4 @@ export default {
     getTools,
     generateAssistantInstruction
 }
+

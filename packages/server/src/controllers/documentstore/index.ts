@@ -11,8 +11,8 @@ import { getPageAndLimitParams } from '../../utils/pagination'
 const resolveWorkspaceAndOrg = async (req: Request, body?: any) => {
     const appServer = getRunningExpressApp()
 
-    let workspaceId = req.user?.activeWorkspaceId || body?.workspaceId || ''
-    let orgId = req.user?.activeOrganizationId || req.user?.organizationId || body?.organizationId || ''
+    let workspaceId = req.user?.activeWorkspaceId || body?.workspaceId
+    let orgId = req.user?.activeOrganizationId || req.user?.organizationId || body?.organizationId
 
     if (!workspaceId && body?.storeId) {
         const store = await appServer.AppDataSource.getRepository(DocumentStore).findOneBy({ id: body.storeId })
@@ -21,7 +21,7 @@ const resolveWorkspaceAndOrg = async (req: Request, body?: any) => {
 
     if (!orgId && workspaceId) {
         const workspace = await appServer.AppDataSource.getRepository(Workspace).findOneBy({ id: workspaceId })
-        orgId = workspace?.organizationId || ''
+        orgId = workspace?.organizationId
     }
 
     return { workspaceId, orgId }
@@ -56,7 +56,7 @@ const getAllDocumentStores = async (req: Request, res: Response, next: NextFunct
     try {
         const { page, limit } = getPageAndLimitParams(req)
 
-        const workspaceId = req.user?.activeWorkspaceId || ''
+        const workspaceId = req.user?.activeWorkspaceId
 const apiResponse: any = await documentStoreService.getAllDocumentStores(workspaceId, page, limit)
         if (apiResponse?.total >= 0) {
             return res.json({
@@ -112,7 +112,7 @@ const getDocumentStoreById = async (req: Request, res: Response, next: NextFunct
                 `Error: documentStoreController.getDocumentStoreById - id not provided!`
             )
         }
-        const workspaceId = req.user?.activeWorkspaceId || ''
+        const workspaceId = req.user?.activeWorkspaceId
 const apiResponse = await documentStoreService.getDocumentStoreById(req.params.id, workspaceId)
         if (apiResponse && apiResponse.whereUsed) {
             apiResponse.whereUsed = JSON.stringify(await documentStoreService.getUsedChatflowNames(apiResponse, workspaceId))
@@ -137,7 +137,7 @@ const getDocumentStoreFileChunks = async (req: Request, res: Response, next: Nex
                 `Error: documentStoreController.getDocumentStoreFileChunks - fileId not provided!`
             )
         }
-        const workspaceId = req.user?.activeWorkspaceId || ''
+        const workspaceId = req.user?.activeWorkspaceId
 const appDataSource = getRunningExpressApp().AppDataSource
         const page = req.params.pageNo ? parseInt(req.params.pageNo) : 1
         const apiResponse = await documentStoreService.getDocumentStoreFileChunks(
@@ -173,7 +173,7 @@ const deleteDocumentStoreFileChunk = async (req: Request, res: Response, next: N
                 `Error: documentStoreController.deleteDocumentStoreFileChunk - chunkId not provided!`
             )
         }
-        const workspaceId = req.user?.activeWorkspaceId || ''
+        const workspaceId = req.user?.activeWorkspaceId
 const apiResponse = await documentStoreService.deleteDocumentStoreFileChunk(
             req.params.storeId,
             req.params.loaderId,
@@ -213,7 +213,7 @@ const editDocumentStoreFileChunk = async (req: Request, res: Response, next: Nex
                 `Error: documentStoreController.editDocumentStoreFileChunk - body not provided!`
             )
         }
-        const workspaceId = req.user?.activeWorkspaceId || ''
+        const workspaceId = req.user?.activeWorkspaceId
 const apiResponse = await documentStoreService.editDocumentStoreFileChunk(
             req.params.storeId,
             req.params.loaderId,
@@ -238,7 +238,7 @@ const saveProcessingLoader = async (req: Request, res: Response, next: NextFunct
             )
         }
         const body = req.body
-        const workspaceId = req.user?.activeWorkspaceId || ''
+        const workspaceId = req.user?.activeWorkspaceId
 const apiResponse = await documentStoreService.saveProcessingLoader(appServer.AppDataSource, body, workspaceId)
         return res.json(apiResponse)
     } catch (error) {
@@ -263,7 +263,7 @@ const processLoader = async (req: Request, res: Response, next: NextFunction) =>
         const body = req.body
         const { workspaceId, orgId } = await resolveWorkspaceAndOrg(req, body)
         const safeOrgId = getSafeOrgId(orgId)
-const subscriptionId = req.user?.activeOrganizationSubscriptionId || ''
+const subscriptionId = req.user?.activeOrganizationSubscriptionId
         const docLoaderId = req.params.loaderId
         const isInternalRequest = req.headers['x-request-from'] === 'internal'
         const apiResponse = await documentStoreService.processLoaderMiddleware(
@@ -295,7 +295,7 @@ const updateDocumentStore = async (req: Request, res: Response, next: NextFuncti
                 `Error: documentStoreController.updateDocumentStore - body not provided!`
             )
         }
-        const workspaceId = req.user?.activeWorkspaceId || ''
+        const workspaceId = req.user?.activeWorkspaceId
 const store = await documentStoreService.getDocumentStoreById(req.params.id, workspaceId)
         if (!store) {
             throw new InternalFlowiseError(
@@ -359,7 +359,7 @@ const previewFileChunks = async (req: Request, res: Response, next: NextFunction
         const body = req.body
         const { workspaceId, orgId } = await resolveWorkspaceAndOrg(req, body)
         const safeOrgId = getSafeOrgId(orgId)
-const subscriptionId = req.user?.activeOrganizationSubscriptionId || ''
+const subscriptionId = req.user?.activeOrganizationSubscriptionId
         body.preview = true
         const apiResponse = await documentStoreService.previewChunksMiddleware(
             body,
@@ -391,7 +391,7 @@ const insertIntoVectorStore = async (req: Request, res: Response, next: NextFunc
         const body = req.body
         const { workspaceId, orgId } = await resolveWorkspaceAndOrg(req, body)
         const safeOrgId = getSafeOrgId(orgId)
-const subscriptionId = req.user?.activeOrganizationSubscriptionId || ''
+const subscriptionId = req.user?.activeOrganizationSubscriptionId
         const isStrictSave = body.isStrictSave ?? false
         const apiResponse = await documentStoreService.insertIntoVectorStoreMiddleware(
             body,
@@ -434,7 +434,7 @@ const deleteVectorStoreFromStore = async (req: Request, res: Response, next: Nex
                 `Error: documentStoreController.deleteVectorStoreFromStore - storeId not provided!`
             )
         }
-        const workspaceId = req.user?.activeWorkspaceId || ''
+        const workspaceId = req.user?.activeWorkspaceId
 const apiResponse = await documentStoreService.deleteVectorStoreFromStore(
             req.params.storeId,
             workspaceId,
@@ -453,7 +453,7 @@ const saveVectorStoreConfig = async (req: Request, res: Response, next: NextFunc
         }
         const body = req.body
         const appDataSource = getRunningExpressApp().AppDataSource
-        const workspaceId = req.user?.activeWorkspaceId || ''
+        const workspaceId = req.user?.activeWorkspaceId
 const apiResponse = await documentStoreService.saveVectorStoreConfig(appDataSource, body, true, workspaceId)
         return res.json(apiResponse)
     } catch (error) {
@@ -467,7 +467,7 @@ const updateVectorStoreConfigOnly = async (req: Request, res: Response, next: Ne
             throw new Error('Error: documentStoreController.updateVectorStoreConfigOnly - body not provided!')
         }
         const body = req.body
-        const workspaceId = req.user?.activeWorkspaceId || ''
+        const workspaceId = req.user?.activeWorkspaceId
 const apiResponse = await documentStoreService.updateVectorStoreConfigOnly(body, workspaceId)
         return res.json(apiResponse)
     } catch (error) {
@@ -521,7 +521,7 @@ const upsertDocStoreMiddleware = async (req: Request, res: Response, next: NextF
                 `Error: documentStoreController.createDocumentStore - organizationId not provided!`
             )
         }
-const subscriptionId = req.user?.activeOrganizationSubscriptionId || ''
+const subscriptionId = req.user?.activeOrganizationSubscriptionId
         const files = (req.files as Express.Multer.File[]) || []
         const apiResponse = await documentStoreService.upsertDocStoreMiddleware(
             req.params.id,
@@ -560,7 +560,7 @@ const refreshDocStoreMiddleware = async (req: Request, res: Response, next: Next
                 `Error: documentStoreController.createDocumentStore - organizationId not provided!`
             )
         }
-const subscriptionId = req.user?.activeOrganizationSubscriptionId || ''
+const subscriptionId = req.user?.activeOrganizationSubscriptionId
         const apiResponse = await documentStoreService.refreshDocStoreMiddleware(
             req.params.id,
             body,
@@ -647,3 +647,4 @@ export default {
     generateDocStoreToolDesc,
     getDocStoreConfigs
 }
+

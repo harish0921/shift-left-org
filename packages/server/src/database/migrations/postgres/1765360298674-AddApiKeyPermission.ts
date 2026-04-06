@@ -20,25 +20,35 @@ export class AddApiKeyPermission1765360298674 implements MigrationInterface {
         const sso = 'sso:manage'
         const apikey = 'apikeys:import'
         const itemsToRemove = [sso, apikey]
-        try {
-            const roles: any[] = await queryRunner.query(
-                `SELECT * FROM "role" WHERE "${columnName}" LIKE '%${sso}%' OR "${columnName}" LIKE '%${apikey}%';`
-            )
-            if (roles.length > 0) {
-                for (const role of roles) {
-                    let permissions: string[] = []
-                    try {
-                        permissions = JSON.parse(role.permissions)
-                    } catch (error) {
-                        logger.error(`AddApiKeyPermission1765360298674 error parsing permissions for role ${role.id}:`, error)
-                        continue
-                    }
-                    permissions = permissions.filter((permission: string) => !itemsToRemove.includes(permission))
-                    await queryRunner.query(`UPDATE "role" SET "${columnName}" = '${JSON.stringify(permissions)}' WHERE "id" = '${role.id}';`)
-                }
-            }
-        } catch (error) {
+        const roleLookup: Array<{ exists: boolean | string }> = await queryRunner.query(`
+            SELECT EXISTS (
+                SELECT 1
+                FROM information_schema.tables
+                WHERE table_schema = 'public'
+                  AND table_name = 'role'
+            ) as "exists";
+        `)
+        const roleTableExists = roleLookup?.[0]?.exists === true || roleLookup?.[0]?.exists === 't'
+        if (!roleTableExists) {
             logger.warn('AddApiKeyPermission1765360298674 skipped role permission update because role table is unavailable')
+            return
+        }
+
+        const roles: any[] = await queryRunner.query(
+            `SELECT * FROM "role" WHERE "${columnName}" LIKE '%${sso}%' OR "${columnName}" LIKE '%${apikey}%';`
+        )
+        if (roles.length > 0) {
+            for (const role of roles) {
+                let permissions: string[] = []
+                try {
+                    permissions = JSON.parse(role.permissions)
+                } catch (error) {
+                    logger.error(`AddApiKeyPermission1765360298674 error parsing permissions for role ${role.id}:`, error)
+                    continue
+                }
+                permissions = permissions.filter((permission: string) => !itemsToRemove.includes(permission))
+                await queryRunner.query(`UPDATE "role" SET "${columnName}" = '${JSON.stringify(permissions)}' WHERE "id" = '${role.id}';`)
+            }
         }
     }
 

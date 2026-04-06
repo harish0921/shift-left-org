@@ -152,7 +152,7 @@ const removeAllChatMessages = async (req: Request, res: Response, next: NextFunc
             )
         }
         const orgId = req.user?.activeOrganizationId || req.user?.organizationId || 'unknown'
-        const workspaceId = req.user?.activeWorkspaceId || req.user?.workspaceId || ''
+        const workspaceId = req.user?.activeWorkspaceId || req.user?.workspaceId
 const chatflowid = req.params.id
         const chatflow = await chatflowsService.getChatflowById(req.params.id, workspaceId)
         if (!chatflow) {
@@ -357,3 +357,4 @@ export default {
     removeAllChatMessages,
     abortChatMessage
 }
+

@@ -11,7 +11,7 @@ const getSingleFlowConfig = async (req: Request, res: Response, next: NextFuncti
                 `Error: flowConfigsController.getSingleFlowConfig - id not provided!`
             )
         }
-        const workspaceId = req.user?.activeWorkspaceId || ''
+        const workspaceId = req.user?.activeWorkspaceId
 const apiResponse = await flowConfigsService.getSingleFlowConfig(req.params.id, workspaceId)
         return res.json(apiResponse)
     } catch (error) {
@@ -22,3 +22,4 @@ const apiResponse = await flowConfigsService.getSingleFlowConfig(req.params.id, 
 export default {
     getSingleFlowConfig
 }
+
