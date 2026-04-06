@@ -14,7 +14,7 @@
                     "preinstall":  "npx only-allow pnpm",
                     "dev":  "concurrently \"pnpm --filter shiftleft-server dev\" \"pnpm --filter shiftleft-ui dev\"",
                     "build":  "pnpm --filter @flowiseai/components build \u0026\u0026 pnpm --filter shiftleft-server build \u0026\u0026 pnpm --filter shiftleft-ui build",
-                    "start":  "pnpm --filter shiftleft-server start",
+                    "start":  "pnpm --filter shiftleft-server start",`n                    "comments":  "rg -n \"TODO|FIXME\" packages -S",
                     "clean":  "pnpm -r exec rm -rf node_modules dist build"
                 },
     "lint-staged":  {
