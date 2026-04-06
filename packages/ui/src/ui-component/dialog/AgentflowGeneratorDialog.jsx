@@ -182,7 +182,15 @@ const AgentflowGeneratorDialog = ({ show, dialogProps, onCancel, onConfirm }) =>
     }, [loading])
 
     const onGenerate = async () => {
-        if (!customAssistantInstruction.trim()) return
+        if (!customAssistantInstruction.trim()) {
+            displayWarning('Please enter a prompt to generate an agentflow.')
+            return
+        }
+
+        if (!selectedChatModel || !Object.keys(selectedChatModel).length) {
+            displayWarning('Please select a model to generate an agentflow.')
+            return
+        }
 
         // Validate all mandatory fields before proceeding
         const { isValid, missingFields } = checkMandatoryFields()
@@ -424,13 +432,7 @@ const AgentflowGeneratorDialog = ({ show, dialogProps, onCancel, onConfirm }) =>
                                         '&:hover': { background: 'linear-gradient(45deg, #FF8E53 30%, #FF6B6B 90%)' }
                                     }}
                                     startIcon={<IconSparkles size={20} />}
-                                    disabled={
-                                        loading ||
-                                        !customAssistantInstruction.trim() ||
-                                        !selectedChatModel ||
-                                        !Object.keys(selectedChatModel).length ||
-                                        !checkMandatoryFields().isValid
-                                    }
+                                    disabled={loading}
                                 >
                                     Generate
                                 </LoadingButton>

@@ -823,6 +823,12 @@ const VectorStoreConfigure = () => {
                                                     color: customization?.isDarkMode ? 'white' : 'inherit',
                                                     borderRadius: '10px',
                                                     minHeight: '200px',
+                                                    textTransform: 'none',
+                                                    whiteSpace: 'normal',
+                                                    wordBreak: 'break-word',
+                                                    textAlign: 'center',
+                                                    lineHeight: 1.4,
+                                                    px: 2,
                                                     opacity: isRecordManagerDisabled() ? 0.7 : 1,
                                                     boxShadow: isRecordManagerDisabled() ? 'none' : '0 2px 14px 0 rgb(32 40 45 / 20%)',
                                                     backgroundImage: customization?.isDarkMode
@@ -999,4 +1005,3 @@ const VectorStoreConfigure = () => {
 }
 
 export default VectorStoreConfigure
-

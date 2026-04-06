@@ -21,7 +21,7 @@
               },
     "scripts":  {
                     "build":  "tsc",
-                    "start":  "run-script-os",
+                    "start":  "node dist/index.js",
                     "clean":  "rimraf dist",
                     "nuke":  "rimraf dist node_modules .turbo",
                     "start:windows":  "cd bin \u0026\u0026 run start",
@@ -152,8 +152,8 @@
                          "winston-azure-blob":  "^1.5.0",
                          "winston-daily-rotate-file":  "^5.0.0",
                          "@flowiseai/components":  "workspace:*",
-                         "flowise-ui":  "workspace:^",
-                         "flowise-components":  "workspace:^"
+                         "shiftleft-ui":  "workspace:*",
+                         "flowise-components":  "workspace:@flowiseai/components@*"
                      },
     "devDependencies":  {
                             "@types/content-disposition":  "0.5.8",
@@ -188,4 +188,3 @@
                             "typescript":  "^5.4.5"
                         }
 }
-

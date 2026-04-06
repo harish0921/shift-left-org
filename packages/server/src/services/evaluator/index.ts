@@ -9,7 +9,9 @@ const getAllEvaluators = async (workspaceId: string, page: number = -1, limit: n
     try {
         const appServer = getRunningExpressApp()
         const queryBuilder = appServer.AppDataSource.getRepository(Evaluator).createQueryBuilder('ev').orderBy('ev.updatedDate', 'DESC')
-        queryBuilder.andWhere('ev.workspaceId = :workspaceId', { workspaceId })
+        if (workspaceId) {
+            queryBuilder.andWhere('ev.workspaceId = :workspaceId', { workspaceId })
+        }
         if (page > 0 && limit > 0) {
             queryBuilder.skip((page - 1) * limit)
             queryBuilder.take(limit)
@@ -34,10 +36,7 @@ const getAllEvaluators = async (workspaceId: string, page: number = -1, limit: n
 const getEvaluator = async (id: string, workspaceId: string) => {
     try {
         const appServer = getRunningExpressApp()
-        const evaluator = await appServer.AppDataSource.getRepository(Evaluator).findOneBy({
-            id: id,
-            workspaceId: workspaceId
-        })
+        const evaluator = await appServer.AppDataSource.getRepository(Evaluator).findOneBy(workspaceId ? { id, workspaceId } : { id })
         if (!evaluator) throw new Error(`Evaluator ${id} not found`)
         return EvaluatorDTO.fromEntity(evaluator)
     } catch (error) {
@@ -69,10 +68,7 @@ const createEvaluator = async (body: any) => {
 const updateEvaluator = async (id: string, body: any, workspaceId: string) => {
     try {
         const appServer = getRunningExpressApp()
-        const evaluator = await appServer.AppDataSource.getRepository(Evaluator).findOneBy({
-            id: id,
-            workspaceId: workspaceId
-        })
+        const evaluator = await appServer.AppDataSource.getRepository(Evaluator).findOneBy(workspaceId ? { id, workspaceId } : { id })
 
         if (!evaluator) throw new Error(`Evaluator ${id} not found`)
 
@@ -93,7 +89,7 @@ const updateEvaluator = async (id: string, body: any, workspaceId: string) => {
 const deleteEvaluator = async (id: string, workspaceId: string) => {
     try {
         const appServer = getRunningExpressApp()
-        return await appServer.AppDataSource.getRepository(Evaluator).delete({ id: id, workspaceId: workspaceId })
+        return await appServer.AppDataSource.getRepository(Evaluator).delete(workspaceId ? { id, workspaceId } : { id })
     } catch (error) {
         throw new InternalFlowiseError(
             StatusCodes.INTERNAL_SERVER_ERROR,

@@ -42,10 +42,13 @@ const ViewHeader = ({
                     p: 0,
                     display: 'flex',
                     justifyContent: 'space-between',
-                    width: '100%'
+                    width: '100%',
+                    alignItems: 'flex-start',
+                    flexWrap: 'wrap',
+                    rowGap: 1.5
                 }}
             >
-                <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', flex: '1 1 520px', minWidth: 0, pr: 1 }}>
                     {isBackButton && (
                         <StyledFab
                             sx={{
@@ -80,7 +83,8 @@ const ViewHeader = ({
                                 textOverflow: 'ellipsis',
                                 overflow: 'hidden',
                                 flex: 1,
-                                maxWidth: 'calc(100vh - 100px)'
+                                minWidth: 0,
+                                maxWidth: { xs: '100%', md: '680px' }
                             }}
                             variant='h1'
                         >
@@ -98,7 +102,8 @@ const ViewHeader = ({
                                     textOverflow: 'ellipsis',
                                     overflow: 'hidden',
                                     flex: 1,
-                                    maxWidth: 'calc(100vh - 100px)'
+                                    minWidth: 0,
+                                    maxWidth: { xs: '100%', md: '680px' }
                                 }}
                             >
                                 {description}
@@ -126,7 +131,17 @@ const ViewHeader = ({
                         </IconButton>
                     )}
                 </Box>
-                <Box sx={{ height: 40, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box
+                    sx={{
+                        minHeight: 40,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        flexWrap: 'wrap',
+                        justifyContent: { xs: 'flex-start', md: 'flex-end' },
+                        width: { xs: '100%', md: 'auto' }
+                    }}
+                >
                     {search && (
                         <OutlinedInput
                             inputRef={searchInputRef}

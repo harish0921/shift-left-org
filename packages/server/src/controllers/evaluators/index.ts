@@ -34,7 +34,7 @@ const createEvaluator = async (req: Request, res: Response, next: NextFunction) 
             throw new InternalFlowiseError(StatusCodes.PRECONDITION_FAILED, `Error: evaluatorService.createEvaluator - body not provided!`)
         }
         const body = req.body
-        body.workspaceId = req.user?.activeWorkspaceId
+        body.workspaceId = req.user?.activeWorkspaceId || req.user?.workspaceId || body.workspaceId || ''
         const apiResponse = await evaluatorService.createEvaluator(body)
         return res.json(apiResponse)
     } catch (error) {

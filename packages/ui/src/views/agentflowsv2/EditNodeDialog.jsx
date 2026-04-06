@@ -22,7 +22,7 @@ const EditNodeDialog = ({ show, dialogProps, onCancel }) => {
 
     const [inputParams, setInputParams] = useState([])
     const [data, setData] = useState({})
-    const [isEditingNodeName, setEditingNodeName] = useState(null)
+    const [isEditingNodeName, setEditingNodeName] = useState(false)
     const [nodeName, setNodeName] = useState('')
 
     const onNodeLabelChange = () => {
@@ -85,10 +85,12 @@ const EditNodeDialog = ({ show, dialogProps, onCancel }) => {
             setData(dialogProps.data)
             if (dialogProps.data.label) setNodeName(dialogProps.data.label)
         }
+        setEditingNodeName(false)
 
         return () => {
             setInputParams([])
             setData({})
+            setEditingNodeName(false)
         }
     }, [dialogProps])
 
@@ -125,7 +127,7 @@ const EditNodeDialog = ({ show, dialogProps, onCancel }) => {
                                 </Typography>
 
                                 {data?.id && (
-                                    <ButtonBase title='Edit Name' sx={{ borderRadius: '50%' }}>
+                                    <ButtonBase title='Edit Name' sx={{ borderRadius: '50%' }} onClick={() => setEditingNodeName(true)}>
                                         <Avatar
                                             variant='rounded'
                                             sx={{
@@ -133,15 +135,14 @@ const EditNodeDialog = ({ show, dialogProps, onCancel }) => {
                                                 ...theme.typography.mediumAvatar,
                                                 transition: 'all .2s ease-in-out',
                                                 ml: 1,
-                                                background: theme.palette.secondary.light,
-                                                color: theme.palette.secondary.dark,
+                                                background: 'rgba(255, 106, 0, 0.12)',
+                                                color: theme.palette.primary.main,
                                                 '&:hover': {
-                                                    background: theme.palette.secondary.dark,
-                                                    color: theme.palette.secondary.light
+                                                    background: theme.palette.primary.main,
+                                                    color: '#fff'
                                                 }
                                             }}
                                             color='inherit'
-                                            onClick={() => setEditingNodeName(true)}
                                         >
                                             <IconPencil stroke={1.5} size='1rem' />
                                         </Avatar>

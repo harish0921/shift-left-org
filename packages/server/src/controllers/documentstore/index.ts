@@ -515,7 +515,12 @@ const upsertDocStoreMiddleware = async (req: Request, res: Response, next: NextF
         }
         const body = req.body
         const { workspaceId, orgId } = await resolveWorkspaceAndOrg(req, body)
-        const safeOrgId = getSafeOrgId(orgId)
+        if (!orgId) {
+            throw new InternalFlowiseError(
+                StatusCodes.PRECONDITION_FAILED,
+                `Error: documentStoreController.createDocumentStore - organizationId not provided!`
+            )
+        }
 const subscriptionId = req.user?.activeOrganizationSubscriptionId || ''
         const files = (req.files as Express.Multer.File[]) || []
         const apiResponse = await documentStoreService.upsertDocStoreMiddleware(
@@ -549,7 +554,12 @@ const refreshDocStoreMiddleware = async (req: Request, res: Response, next: Next
         }
         const body = req.body
         const { workspaceId, orgId } = await resolveWorkspaceAndOrg(req, body)
-        const safeOrgId = getSafeOrgId(orgId)
+        if (!orgId) {
+            throw new InternalFlowiseError(
+                StatusCodes.PRECONDITION_FAILED,
+                `Error: documentStoreController.createDocumentStore - organizationId not provided!`
+            )
+        }
 const subscriptionId = req.user?.activeOrganizationSubscriptionId || ''
         const apiResponse = await documentStoreService.refreshDocStoreMiddleware(
             req.params.id,

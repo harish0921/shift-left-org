@@ -162,8 +162,11 @@ const Evaluators = () => {
 
     useEffect(() => {
         if (getAllEvaluators.data) {
-            setEvaluators(getAllEvaluators.data.data)
-            setTotal(getAllEvaluators.data.total)
+            const payload = getAllEvaluators.data
+            const rows = Array.isArray(payload) ? payload : payload.data || []
+            const count = Array.isArray(payload) ? payload.length : payload.total || 0
+            setEvaluators(rows)
+            setTotal(count)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [getAllEvaluators.data])
