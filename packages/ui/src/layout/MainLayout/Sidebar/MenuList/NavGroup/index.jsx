@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types'
+import { useSelector } from 'react-redux'
 
 // material-ui
 import { useTheme } from '@mui/material/styles'
-import { Divider, List, Typography } from '@mui/material'
+import { Divider, List, Typography, useMediaQuery } from '@mui/material'
 
 // project imports
 import NavItem from '../NavItem'
@@ -14,6 +15,9 @@ import { Available } from '@/ui-component/rbac/available'
 
 const NavGroup = ({ item }) => {
     const theme = useTheme()
+    const customization = useSelector((state) => state.customization)
+    const matchesSM = useMediaQuery(theme.breakpoints.down('lg'))
+    const isMiniMode = !customization.opened && !matchesSM
     const { hasPermission, hasDisplay } = useAuth()
 
     const listItems = (menu, level = 1) => {
@@ -61,6 +65,7 @@ const NavGroup = ({ item }) => {
         <>
             <List
                 subheader={
+                    !isMiniMode &&
                     item.title && (
                         <Typography variant='caption' sx={{ ...theme.typography.menuCaption }} display='block' gutterBottom>
                             {item.title}
@@ -72,7 +77,7 @@ const NavGroup = ({ item }) => {
                         </Typography>
                     )
                 }
-                sx={{ p: '16px', py: 2, display: 'flex', flexDirection: 'column', gap: 1 }}
+                sx={{ p: isMiniMode ? '12px 8px' : '16px', py: 2, display: 'flex', flexDirection: 'column', gap: 1 }}
             >
                 {renderPrimaryItems().map((menu) => listItems(menu))}
             </List>
@@ -85,11 +90,13 @@ const NavGroup = ({ item }) => {
                             <Divider sx={{ height: '1px', borderColor: theme.palette.grey[900] + 25, my: 0 }} />
                             <List
                                 subheader={
-                                    <Typography variant='caption' sx={{ ...theme.typography.subMenuCaption }} display='block' gutterBottom>
-                                        {group.title}
-                                    </Typography>
+                                    !isMiniMode ? (
+                                        <Typography variant='caption' sx={{ ...theme.typography.subMenuCaption }} display='block' gutterBottom>
+                                            {group.title}
+                                        </Typography>
+                                    ) : null
                                 }
-                                sx={{ p: '16px', py: 2, display: 'flex', flexDirection: 'column', gap: 1 }}
+                                sx={{ p: isMiniMode ? '12px 8px' : '16px', py: 2, display: 'flex', flexDirection: 'column', gap: 1 }}
                             >
                                 {group.children.map((menu) => listItems(menu))}
                             </List>

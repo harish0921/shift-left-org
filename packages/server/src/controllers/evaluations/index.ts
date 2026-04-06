@@ -5,7 +5,7 @@ import evaluationsService from '../../services/evaluations'
 import { getPageAndLimitParams } from '../../utils/pagination'
 
 const resolveWorkspaceId = (req: Request, body?: any) => {
-    return req.user?.activeWorkspaceId || req.user?.workspaceId || body?.workspaceId || ''
+    return req.user?.activeWorkspaceId || req.user?.workspaceId || body?.workspaceId
 }
 
 const resolveOrgId = (req: Request, body?: any) => {
@@ -135,3 +135,4 @@ export default {
     getVersions,
     patchDeleteEvaluations
 }
+

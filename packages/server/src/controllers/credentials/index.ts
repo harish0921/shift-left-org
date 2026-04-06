@@ -28,7 +28,7 @@ const deleteCredentials = async (req: Request, res: Response, next: NextFunction
                 `Error: credentialsController.deleteCredentials - id not provided!`
             )
         }
-        const workspaceId = req.user?.activeWorkspaceId || ''
+        const workspaceId = req.user?.activeWorkspaceId
 const apiResponse = await credentialsService.deleteCredentials(req.params.id, workspaceId)
         return res.json(apiResponse)
     } catch (error) {
@@ -38,7 +38,7 @@ const apiResponse = await credentialsService.deleteCredentials(req.params.id, wo
 
 const getAllCredentials = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const workspaceId = req.user?.activeWorkspaceId || ''
+        const workspaceId = req.user?.activeWorkspaceId
 const apiResponse = await credentialsService.getAllCredentials(req.query.credentialName, workspaceId)
         return res.json(apiResponse)
     } catch (error) {
@@ -54,7 +54,7 @@ const getCredentialById = async (req: Request, res: Response, next: NextFunction
                 `Error: credentialsController.getCredentialById - id not provided!`
             )
         }
-        const workspaceId = req.user?.activeWorkspaceId || ''
+        const workspaceId = req.user?.activeWorkspaceId
 const apiResponse = await credentialsService.getCredentialById(req.params.id, workspaceId)
         return res.json(apiResponse)
     } catch (error) {
@@ -76,7 +76,7 @@ const updateCredential = async (req: Request, res: Response, next: NextFunction)
                 `Error: credentialsController.updateCredential - body not provided!`
             )
         }
-        const workspaceId = req.user?.activeWorkspaceId || ''
+        const workspaceId = req.user?.activeWorkspaceId
 const apiResponse = await credentialsService.updateCredential(req.params.id, req.body, workspaceId)
         return res.json(apiResponse)
     } catch (error) {
@@ -91,3 +91,4 @@ export default {
     getCredentialById,
     updateCredential
 }
+

@@ -5,7 +5,8 @@ import { StatusCodes } from 'http-status-codes'
 import { getPageAndLimitParams } from '../../utils/pagination'
 
 const resolveWorkspaceId = (req: Request, body?: any) => {
-    return req.user?.activeWorkspaceId || req.user?.workspaceId || body?.workspaceId || ''
+    const candidate = req.user?.activeWorkspaceId || req.user?.workspaceId || body?.workspaceId
+    return candidate && String(candidate).trim() ? candidate : undefined
 }
 
 const getAllDatasets = async (req: Request, res: Response, next: NextFunction) => {
@@ -40,7 +41,7 @@ const createDataset = async (req: Request, res: Response, next: NextFunction) =>
         }
         const body = req.body
         const workspaceId = resolveWorkspaceId(req, body)
-        body.workspaceId = workspaceId
+        if (workspaceId) body.workspaceId = workspaceId
         const apiResponse = await datasetService.createDataset(body)
         return res.json(apiResponse)
     } catch (error) {
@@ -86,7 +87,7 @@ const addDatasetRow = async (req: Request, res: Response, next: NextFunction) =>
             throw new InternalFlowiseError(StatusCodes.PRECONDITION_FAILED, `Error: datasetService.addDatasetRow - datasetId not provided!`)
         }
         const workspaceId = resolveWorkspaceId(req, req.body)
-        req.body.workspaceId = workspaceId
+        if (workspaceId) req.body.workspaceId = workspaceId
         const apiResponse = await datasetService.addDatasetRow(req.body)
         return res.json(apiResponse)
     } catch (error) {
@@ -103,7 +104,7 @@ const updateDatasetRow = async (req: Request, res: Response, next: NextFunction)
             throw new InternalFlowiseError(StatusCodes.PRECONDITION_FAILED, `Error: datasetService.updateDatasetRow - id not provided!`)
         }
         const workspaceId = resolveWorkspaceId(req, req.body)
-        req.body.workspaceId = workspaceId
+        if (workspaceId) req.body.workspaceId = workspaceId
         const apiResponse = await datasetService.updateDatasetRow(req.params.id, req.body)
         return res.json(apiResponse)
     } catch (error) {

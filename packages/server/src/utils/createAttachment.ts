@@ -45,9 +45,9 @@ export const createFileAttachment = async (req: Request) => {
         throw new InternalFlowiseError(StatusCodes.NOT_FOUND, `Chatflow ${chatflowid} not found`)
     }
 
-    let orgId = req.user?.activeOrganizationId || ''
-    let workspaceId = req.user?.activeWorkspaceId || ''
-    let subscriptionId = req.user?.activeOrganizationSubscriptionId || ''
+    let orgId = req.user?.activeOrganizationId
+    let workspaceId = req.user?.activeWorkspaceId
+    let subscriptionId = req.user?.activeOrganizationSubscriptionId
 
     // This is one of the WHITELIST_URLS, API can be public and there might be no req.user
     if (!orgId || !workspaceId) {
@@ -237,3 +237,4 @@ export const createFileAttachment = async (req: Request) => {
 
     return fileAttachments
 }
+

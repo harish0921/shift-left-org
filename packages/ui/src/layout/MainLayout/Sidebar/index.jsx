@@ -19,6 +19,7 @@ import { useConfig } from '@/store/context/ConfigContext'
 import { drawerWidth, headerHeight } from '@/store/constant'
 
 // ==============================|| SIDEBAR DRAWER ||============================== //
+const miniDrawerWidth = 88
 
 const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
     const theme = useTheme()
@@ -68,7 +69,7 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
             component='nav'
             sx={{
                 flexShrink: { md: 0 },
-                width: matchUpMd ? drawerWidth : 'auto'
+                width: matchUpMd ? (drawerOpen ? drawerWidth : miniDrawerWidth) : 'auto'
             }}
             aria-label='mailbox folders'
         >
@@ -77,20 +78,22 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
                     container={container}
                     variant={matchUpMd ? 'persistent' : 'temporary'}
                     anchor='left'
-                    open={drawerOpen}
+                    open={matchUpMd ? true : drawerOpen}
                     onClose={drawerToggle}
                     sx={{
                         '& .MuiDrawer-paper': {
-                            width: drawerWidth,
-                            background: theme.palette.mode === 'light' ? '#FFF7F0' : 'rgba(9,12,18,0.72)',
-                            backdropFilter: theme.palette.mode === 'dark' ? 'blur(18px)' : 'none',
-                            WebkitBackdropFilter: theme.palette.mode === 'dark' ? 'blur(18px)' : 'none',
+                            width: matchUpMd ? (drawerOpen ? drawerWidth : miniDrawerWidth) : drawerWidth,
+                            background: theme.palette.mode === 'light' ? 'rgba(255, 247, 240, 0.68)' : 'rgba(8, 12, 20, 0.84)',
+                            backdropFilter: 'blur(18px)',
+                            WebkitBackdropFilter: 'blur(18px)',
                             color: theme.palette.text.primary,
+                            overflowX: 'hidden',
                             [theme.breakpoints.up('md')]: {
                                 top: `${headerHeight}px`
                             },
                             borderRight: drawerOpen ? '1px solid' : 'none',
-                            borderColor: drawerOpen ? (theme.palette.mode === 'light' ? '#FFDCC8' : 'rgba(255,255,255,0.08)') : 'transparent'
+                            borderColor: drawerOpen ? (theme.palette.mode === 'light' ? '#FFDCC8' : 'rgba(143, 170, 204, 0.18)') : 'transparent',
+                            boxShadow: theme.palette.mode === 'dark' ? 'inset -1px 0 0 rgba(143, 170, 204, 0.1)' : 'none'
                         }
                     }}
                     ModalProps={{ keepMounted: true }}

@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 
 // material-ui
 import { useTheme } from '@mui/material/styles'
-import { Collapse, List, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material'
+import { Collapse, List, ListItemButton, ListItemIcon, ListItemText, Typography, useMediaQuery } from '@mui/material'
 
 // project imports
 import NavItem from '../NavItem'
@@ -18,6 +18,8 @@ import { IconChevronDown, IconChevronUp } from '@tabler/icons-react'
 const NavCollapse = ({ menu, level }) => {
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
+    const matchesSM = useMediaQuery(theme.breakpoints.down('lg'))
+    const isMiniMode = !customization.opened && !matchesSM
 
     const [open, setOpen] = useState(false)
     const [selected, setSelected] = useState(null)
@@ -59,39 +61,45 @@ const NavCollapse = ({ menu, level }) => {
     return (
         <>
             <ListItemButton
+                title={isMiniMode ? menu.title : undefined}
                 sx={{
                     borderRadius: `${customization.borderRadius}px`,
                     mb: 0.5,
-                    alignItems: 'flex-start',
+                    alignItems: isMiniMode ? 'center' : 'flex-start',
+                    justifyContent: isMiniMode ? 'center' : 'flex-start',
                     backgroundColor: level > 1 ? 'transparent !important' : 'inherit',
                     py: level > 1 ? 1 : 1.25,
-                    pl: `${level * 24}px`
+                    pl: isMiniMode ? 1 : `${level * 24}px`,
+                    pr: isMiniMode ? 1 : 1.5
                 }}
                 selected={selected === menu.id}
                 onClick={handleClick}
             >
-                <ListItemIcon sx={{ my: 'auto', minWidth: !menu.icon ? 18 : 36 }}>{menuIcon}</ListItemIcon>
-                <ListItemText
-                    primary={
-                        <Typography variant={selected === menu.id ? 'h5' : 'body1'} color='inherit' sx={{ my: 'auto' }}>
-                            {menu.title}
-                        </Typography>
-                    }
-                    secondary={
-                        menu.caption && (
-                            <Typography variant='caption' sx={{ ...theme.typography.subMenuCaption }} display='block' gutterBottom>
-                                {menu.caption}
+                <ListItemIcon sx={{ my: 'auto', minWidth: isMiniMode ? 'auto' : !menu.icon ? 18 : 36 }}>{menuIcon}</ListItemIcon>
+                {!isMiniMode && (
+                    <ListItemText
+                        primary={
+                            <Typography variant={selected === menu.id ? 'h5' : 'body1'} color='inherit' sx={{ my: 'auto' }}>
+                                {menu.title}
                             </Typography>
-                        )
-                    }
-                />
-                {open ? (
-                    <IconChevronUp stroke={1.5} size='1rem' style={{ marginTop: 'auto', marginBottom: 'auto' }} />
-                ) : (
-                    <IconChevronDown stroke={1.5} size='1rem' style={{ marginTop: 'auto', marginBottom: 'auto' }} />
+                        }
+                        secondary={
+                            menu.caption && (
+                                <Typography variant='caption' sx={{ ...theme.typography.subMenuCaption }} display='block' gutterBottom>
+                                    {menu.caption}
+                                </Typography>
+                            )
+                        }
+                    />
                 )}
+                {!isMiniMode &&
+                    (open ? (
+                        <IconChevronUp stroke={1.5} size='1rem' style={{ marginTop: 'auto', marginBottom: 'auto' }} />
+                    ) : (
+                        <IconChevronDown stroke={1.5} size='1rem' style={{ marginTop: 'auto', marginBottom: 'auto' }} />
+                    ))}
             </ListItemButton>
-            <Collapse in={open} timeout='auto' unmountOnExit>
+            <Collapse in={isMiniMode ? false : open} timeout='auto' unmountOnExit>
                 <List
                     component='div'
                     disablePadding

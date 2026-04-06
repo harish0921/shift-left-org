@@ -3,16 +3,16 @@ import { StatusCodes } from 'http-status-codes'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import exportImportService from '../../services/export-import'
 const resolveImportContext = async (req: Request) => {
-    const workspaceId = req.user?.activeWorkspaceId || req.user?.workspaceId || ''
-    let orgId = req.user?.activeOrganizationId || req.user?.organizationId || ''
-    let subscriptionId = req.user?.activeOrganizationSubscriptionId || req.user?.organizationSubscriptionId || ''
+    const workspaceId = req.user?.activeWorkspaceId || req.user?.workspaceId
+    let orgId = req.user?.activeOrganizationId || req.user?.organizationId
+    let subscriptionId = req.user?.activeOrganizationSubscriptionId || req.user?.organizationSubscriptionId
 
     return { workspaceId, orgId, subscriptionId }
 }
 
 const exportData = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const workspaceId = req.user?.activeWorkspaceId || ''
+        const workspaceId = req.user?.activeWorkspaceId
 const apiResponse = await exportImportService.exportData(exportImportService.convertExportInput(req.body), workspaceId)
         return res.json(apiResponse)
     } catch (error) {
@@ -39,7 +39,7 @@ const importData = async (req: Request, res: Response, next: NextFunction) => {
 
 const exportChatflowMessages = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const workspaceId = req.user?.activeWorkspaceId || ''
+        const workspaceId = req.user?.activeWorkspaceId
 const { chatflowId, chatType, feedbackType, startDate, endDate } = req.body
         if (!chatflowId) {
             throw new InternalFlowiseError(
@@ -72,3 +72,4 @@ export default {
     importData,
     exportChatflowMessages
 }
+

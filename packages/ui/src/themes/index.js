@@ -596,6 +596,13 @@ const getComponents = (mode) => ({
     },
     MuiDialog: {
         styleOverrides: {
+            root: {
+                '& .MuiBackdrop-root': {
+                    backgroundColor: mode === 'light' ? 'rgba(246, 241, 236, 0.42)' : 'rgba(6, 9, 14, 0.48)',
+                    backdropFilter: 'blur(10px) saturate(120%)',
+                    WebkitBackdropFilter: 'blur(10px) saturate(120%)'
+                }
+            },
             paper: {
                 backgroundColor: mode === 'light' ? '#FFFFFF' : 'rgba(12,15,22,0.92)',
                 borderRadius: '20px',

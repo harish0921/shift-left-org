@@ -158,10 +158,20 @@ const ChatPopUp = ({ chatflowid, isAgentCanvas, onOpenChange }) => {
     return (
         <>
             <StyledFab
-                sx={{ position: 'absolute', right: 20, top: 20 }}
+                sx={{
+                    position: 'absolute',
+                    right: 20,
+                    top: 20,
+                    background: theme.palette.mode === 'light' ? 'linear-gradient(135deg, #FF7A33 0%, #FF5C00 100%)' : 'linear-gradient(135deg, #FFA15C 0%, #FF6A1A 100%)',
+                    color: '#fff',
+                    boxShadow: theme.palette.mode === 'light' ? '0 10px 24px rgba(255,92,0,0.32)' : '0 10px 24px rgba(255,106,26,0.28)',
+                    '&:hover': {
+                        background: theme.palette.mode === 'light' ? 'linear-gradient(135deg, #FF8A47 0%, #FF6A1A 100%)' : 'linear-gradient(135deg, #FFB074 0%, #FF7A33 100%)'
+                    }
+                }}
                 ref={anchorRef}
                 size='small'
-                color='secondary'
+                color='primary'
                 aria-label='chat'
                 title='Chat'
                 onClick={handleToggle}
